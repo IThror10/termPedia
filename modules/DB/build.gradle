@@ -1,0 +1,63 @@
+buildscript {
+    configurations {
+        driver
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath postgresVersion
+        classpath 'org.apache.groovy:groovy-sql:4.0.4'
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    driver postgresVersion
+    implementation postgresVersion
+}
+
+test.configure {
+    environment "CommandFactory", commandDBMS
+    environment "QueryFactory", queryDBMS
+}
+
+
+apply from: "$rootProject.projectDir/modules/DB/dbTasks.gradle"
+
+tasks.create("initTestCommandDB") {
+    if (commandDBMS == "postgres") {
+        dependsOn(initTestPostgresCommandDB)
+    } else {
+        throw "Unknown Command DB Type : " + commandDBMS
+    }
+}
+
+tasks.create("dropTestCommandDB") {
+    if (commandDBMS == "postgres") {
+        dependsOn(dropTestPostgresCommandDB)
+    } else {
+        throw "Unknown Command DB Type : " + commandDBMS
+    }
+}
+
+tasks.create("initTestQueryDB") {
+    if (queryDBMS == "postgres") {
+        dependsOn(initTestPostgresQueryDB)
+    } else {
+        throw "Unknown Query DB Type : " + queryDBMS
+    }
+}
+
+tasks.create("dropTestQueryDB") {
+    if (queryDBMS == "postgres") {
+        dependsOn(dropTestPostgresQueryDB)
+    } else {
+        throw "Unknown Query DB Type : " + queryDBMS
+    }
+}

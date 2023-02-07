@@ -1,0 +1,5 @@
+rootProject.name = 'web_07'
+
+include(':modules:BL')
+include(':modules:DB')
+include(':modules:WEB')

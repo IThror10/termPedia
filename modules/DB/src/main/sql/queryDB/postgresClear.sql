@@ -1,0 +1,12 @@
+TRUNCATE data.book_search CASCADE;
+TRUNCATE data.term_tag_rates CASCADE;
+TRUNCATE data.term_lit_rates CASCADE;
+TRUNCATE data.authors_lit CASCADE;
+TRUNCATE data.terms CASCADE;
+TRUNCATE data.tags CASCADE;
+TRUNCATE data.authors CASCADE;
+TRUNCATE data.lit_types CASCADE;
+TRUNCATE data.users CASCADE;
+TRUNCATE data.lit CASCADE;
+TRUNCATE data.terms_tags CASCADE;
+TRUNCATE data.terms_lit CASCADE;
