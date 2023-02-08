@@ -1,6 +1,10 @@
 package com.TermPedia.factory.command;
 
 import com.TermPedia.dto.exceptions.ActionsException;
+import com.TermPedia.dto.exceptions.DataConflictException;
+import com.TermPedia.dto.exceptions.FormatException;
+import com.TermPedia.dto.exceptions.NotFoundException;
+import com.TermPedia.dto.users.UserPrivateData;
 import com.TermPedia.dto.users.UserPublicData;
 import com.TermPedia.events.user.AuthorizeEvent;
 import com.TermPedia.events.user.RegisterEvent;
@@ -41,10 +45,11 @@ class StatementReqAuthHandlerTest {
     void register() throws Exception {
         //Mock
         when(statement.execute(any(String.class))).thenReturn(true);
-        when(resultSet.getInt(any(String.class))).thenReturn(2).thenReturn(2).thenReturn(-1)
+        when(resultSet.getInt(any(String.class))).thenReturn(2).thenReturn(-1)
                 .thenReturn(-2).thenReturn(-3);
-        when(resultSet.getString(any(String.class))).thenReturn("admin").thenReturn("babaYaga@yandex.ru")
-                .thenReturn(null).thenReturn(null);
+        when(resultSet.getString(any(String.class))).thenReturn("Secret-String").thenReturn("admin")
+                .thenReturn("babaYaga@yandex.ru").thenReturn(null).thenReturn(null);
+
         //Arrange
         StatementReqAuthHandler handler = new StatementReqAuthHandler(
                 new PostgresAdapter(connection),
@@ -57,22 +62,22 @@ class StatementReqAuthHandlerTest {
         RegisterEvent successRegister = new RegisterEvent("newLogin", "password", "newEmail");
 
         //Act
-        UserPublicData data = handler.register(successRegister).getUserData();
+        UserPrivateData data = handler.register(successRegister).getUserData();
         Executable userExists = () -> handler.register(userRepeat);
         Executable emailExists = () -> handler.register(emailRepeat);
         Executable emailFormatError = () -> handler.register(wrongEmail);
 
         //Assert
         assertAll(
-                () -> assertEquals(2, data.userID()),
                 () -> assertEquals("admin", data.login()),
                 () -> assertEquals("babaYaga@yandex.ru", data.email()),
                 () -> assertEquals(0, data.phones().size()),
                 () -> assertEquals(0, data.posts().size())
         );
-        assertThrows(ActionsException.class, userExists, "This Login is Already Used");
-        assertThrows(ActionsException.class, emailExists, "This Email is Already Used");
-        assertThrows(ActionsException.class, emailFormatError, "Wrong Email address");
+
+        assertThrows(DataConflictException.class, userExists, "This Login is Already Used");
+        assertThrows(DataConflictException.class, emailExists, "This Email is Already Used");
+        assertThrows(FormatException.class, emailFormatError, "Wrong Email address format");
     }
 
     @Test
@@ -80,9 +85,9 @@ class StatementReqAuthHandlerTest {
         //Mock
         when(statement.execute(any(String.class))).thenReturn(true);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getString(any(String.class))).thenReturn("login")
-            .thenReturn("email@yandex.ru").thenReturn(null).thenReturn(null).thenThrow(SQLException.class);
-        when(resultSet.getInt(any(String.class))).thenReturn(1);
+        when(resultSet.getString(any(String.class))).thenReturn("Secret string").thenReturn("login")
+            .thenReturn("email@yandex.ru").thenReturn(null).thenReturn(null);
+        when(resultSet.getInt(any(String.class))).thenReturn(0).thenReturn(-1);
 
         //Arrange
         StatementReqAuthHandler handler = new StatementReqAuthHandler(
@@ -94,12 +99,11 @@ class StatementReqAuthHandlerTest {
         AuthorizeEvent logging = new AuthorizeEvent("some login", "password");
 
         //Act
-        UserPublicData data = handler.authorize(logging).getUserData();
+        UserPrivateData data = handler.authorize(logging).getUserData();
         Executable noUser = () -> handler.authorize(exception);
 
         //Assert
         assertEquals("login", data.login());
-        assertEquals(1, data.userID());
-        assertThrows(ActionsException.class, noUser);
+        assertThrows(NotFoundException.class, noUser);
     }
 }

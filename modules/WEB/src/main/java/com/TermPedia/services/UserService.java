@@ -1,44 +1,29 @@
 package com.TermPedia.services;
 
 import com.TermPedia.dto.exceptions.ActionsException;
-import com.TermPedia.dto.exceptions.NotFoundException;
 import com.TermPedia.dto.users.UserPublicData;
 import com.TermPedia.events.user.AuthorizeEvent;
+import com.TermPedia.events.user.LogoutEvent;
 import com.TermPedia.events.user.RegisterEvent;
+import com.TermPedia.events.user.ValidateEvent;
 import com.TermPedia.handlers.EventHandler;
 import com.TermPedia.handlers.QueryHandler;
 import com.TermPedia.queries.instances.users.GetUserPublicDataQuery;
-import com.TermPedia.securityDTO.AuthenticationResponse;
-import com.TermPedia.securityDTO.ExtendedUser;
-import com.TermPedia.securityDTO.LoginRequest;
-import com.TermPedia.securityDTO.RegisterRequest;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.TermPedia.requests.LogoutRequest;
+import com.TermPedia.responses.AuthenticationResponse;
+import com.TermPedia.requests.LoginRequest;
+import com.TermPedia.requests.RegisterRequest;
 import org.springframework.stereotype.Service;
 
 
 
 @Service
-public class  UserService implements UserDetailsService {
-
+public class UserService {
     private final JwtService jwtService;
 
     public UserService(JwtService jwtService) {
         this.jwtService = jwtService;
     }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        try {
-            UserPublicData data = getUserPublicData(username);
-            return new ExtendedUser(data);
-        } catch (NotFoundException e) {
-            throw new UsernameNotFoundException(e.getMessage());
-        }
-    }
-
     public UserPublicData getUserPublicData(String username) throws ActionsException {
         GetUserPublicDataQuery query = new GetUserPublicDataQuery(username);
         QueryHandler handler = new QueryHandler();
@@ -52,10 +37,10 @@ public class  UserService implements UserDetailsService {
                 request.password(),
                 request.email()
         );
+
         EventHandler handler = new EventHandler();
         handler.handle(event);
 
-//        UserDetails details = new ExtendedUser(event.getResult().getUserData());
         String token = jwtService.generateToken(event.getResult().getUserData());
         return new AuthenticationResponse(token);
     }
@@ -65,12 +50,24 @@ public class  UserService implements UserDetailsService {
                 request.login(),
                 request.password()
         );
+
         EventHandler handler = new EventHandler();
         handler.handle(event);
 
-//        UserDetails details = new ExtendedUser(event.getResult().getUserData());
         String token = jwtService.generateToken(event.getResult().getUserData());
         return new AuthenticationResponse(token);
+    }
+
+    public AuthenticationResponse logout(LogoutRequest request) {
+        LogoutEvent event = new LogoutEvent(request.userId());
+        EventHandler handler = new EventHandler();
+        handler.handle(event);
+        return new AuthenticationResponse(event.getResult().getStatus() ? "true" : "false");
+    }
+    public boolean checkValid(ValidateEvent event) {
+        EventHandler handler = new EventHandler();
+        handler.handle(event);
+        return event.getResult().getUserData().userId() != null;
     }
 }
 

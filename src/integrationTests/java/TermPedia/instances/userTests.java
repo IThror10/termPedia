@@ -3,11 +3,15 @@ package TermPedia.instances;
 import TermPedia.factory.PostgresTestCommandConnection;
 import TermPedia.factory.PostgresTestQueryConnection;
 import com.TermPedia.dto.exceptions.ActionsException;
+import com.TermPedia.dto.users.UserPrivateData;
 import com.TermPedia.dto.users.UserPublicData;
+import com.TermPedia.dto.users.UserValidData;
+import com.TermPedia.events.result.EventStatus;
 import com.TermPedia.events.user.AuthorizeEvent;
+import com.TermPedia.events.user.LogoutEvent;
 import com.TermPedia.events.user.RegisterEvent;
+import com.TermPedia.events.user.ValidateEvent;
 import com.TermPedia.factory.ConstProvider;
-import com.TermPedia.factory.command.ReqAuthHandler;
 import com.TermPedia.factory.command.SyncCommandFactory;
 import com.TermPedia.factory.command.postgres.PostgresCommandFactory;
 import com.TermPedia.factory.query.SyncQueryFactory;
@@ -42,7 +46,6 @@ public class userTests {
         UserPublicData data = query.getResult().getUserData();
 
         //Assert
-        assertEquals(0, data.userID());
         assertEquals("admin", data.login());
         assertEquals("admin@gmail.com", data.email());
         assertAll(
@@ -66,7 +69,6 @@ public class userTests {
         Executable wrongPassword = () -> handler.handle(wrongData);
 
         //Assert
-        assertEquals(0, data.userID());
         assertEquals("admin", data.login());
         assertEquals("admin@gmail.com", data.email());
         assertAll(
@@ -79,20 +81,64 @@ public class userTests {
     }
 
     @Test
-    public void registerUser() {
+    public void registerLogoutTest() {
+        UserPrivateData data;
+        Integer uid;
+
+        data = registerUserTest();
+        uid = sessionIsValidTest(data.login(), data.secret());
+        logoutTest(uid, data.login(), data.secret());
+    }
+
+    private UserPrivateData registerUserTest() {
         //Arrange
         RegisterEvent event = new RegisterEvent("thror", "secret", "babaYaga@yandex.ru");
         EventHandler handler = new EventHandler();
 
         //Act
         handler.handle(event);
-        UserPublicData data = event.getResult().getUserData();
+        UserPrivateData data = event.getResult().getUserData();
 
         //Assert
-        assertEquals(1, data.userID());
         assertEquals("thror", data.login());
         assertEquals("babaYaga@yandex.ru", data.email());
         assertEquals(0, data.phones().size());
         assertEquals(0, data.posts().size());
+
+        return data;
+    }
+
+    private Integer sessionIsValidTest(String login, String secret) {
+        //Arrange
+        ValidateEvent event = new ValidateEvent(login, secret);
+        EventHandler handler = new EventHandler();
+
+        //Act
+        handler.handle(event);
+        UserValidData data = event.getResult().getUserData();
+
+        //Assert
+        assertNotEquals(null, data.login());
+        assertEquals(login, data.login());
+
+        return data.userId();
+    }
+
+    private void logoutTest(Integer uid, String login, String secret) {
+        //Arrange
+        LogoutEvent logout = new LogoutEvent(uid);
+        ValidateEvent validate = new ValidateEvent(login, secret);
+        EventHandler handler = new EventHandler();
+
+        //Act
+        handler.handle(logout);
+        handler.handle(validate);
+
+        EventStatus result = logout.getResult();
+        UserValidData data = validate.getResult().getUserData();
+
+        //Assert
+        assertTrue(result.getStatus());
+        assertNull(data.userId());
     }
 }

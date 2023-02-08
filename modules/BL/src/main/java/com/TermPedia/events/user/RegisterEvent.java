@@ -14,7 +14,7 @@ public class RegisterEvent extends BaseEvent {
     private AuthEventResult result;
     public RegisterEvent(@NotNull String login, @NotNull String password, @NotNull String email)
             throws ActionsException {
-        super(0);
+        super(null);
         this.result = null;
 
         if (login.length() < 5)

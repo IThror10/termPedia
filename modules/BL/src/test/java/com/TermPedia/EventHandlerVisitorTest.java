@@ -62,7 +62,7 @@ class EventHandlerVisitorTest {
         visitor.visitRegisterEvent(newUser);
 
         //Assert
-        assertEquals(2, newUser.getResult().getUserData().userID());
+        assertEquals("login", newUser.getResult().getUserData().login());
         assertThrows(ActionsException.class, registerExistingUser);
     }
 
@@ -86,7 +86,7 @@ class EventHandlerVisitorTest {
         visitor.visitAuthorizeEvent(userExists);
 
         //Assert
-        assertEquals(2, userExists.getResult().getUserData().userID());
+        assertEquals("login", userExists.getResult().getUserData().login());
         assertThrows(ActionsException.class, wrongLoginData);
     }
 

@@ -14,7 +14,7 @@ public class AuthorizeEvent extends BaseEvent {
     private AuthEventResult result;
 
     public AuthorizeEvent(@NotNull String login, @NotNull String password) throws ActionsException {
-        super(0);
+        super(null);
         this.result = null;
         this.eventType = EventType.authorization;
 

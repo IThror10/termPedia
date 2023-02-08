@@ -1,7 +1,9 @@
 package com.TermPedia.factory.command.postgres;
 
 import com.TermPedia.events.user.AuthorizeEvent;
+import com.TermPedia.events.user.LogoutEvent;
 import com.TermPedia.events.user.RegisterEvent;
+import com.TermPedia.events.user.ValidateEvent;
 import com.TermPedia.factory.command.common.IReqAuthHandlerRequests;
 import com.TermPedia.queries.instances.users.GetUserPublicDataQuery;
 
@@ -30,6 +32,26 @@ public class PostgresReqAuthHandlerRequests implements IReqAuthHandlerRequests {
         builder.append("SELECT * FROM app.authorize_user('");
         builder.append(event.getData());
         builder.append("');");
+        return builder.toString();
+    }
+
+    @Override
+    public String validEventQuery(ValidateEvent event) {
+        builder.setLength(0);
+        builder.append("SELECT * FROM app.validate('");
+        builder.append(event.login);
+        builder.append("', '");
+        builder.append(event.secret);
+        builder.append("');");
+        return builder.toString();
+    }
+
+    @Override
+    public String logoutEventQuery(LogoutEvent event) {
+        builder.setLength(0);
+        builder.append("SELECT app.logout(");
+        builder.append(event.userId);
+        builder.append(") as status;");
         return builder.toString();
     }
 

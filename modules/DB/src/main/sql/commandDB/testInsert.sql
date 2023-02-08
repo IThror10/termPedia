@@ -1,6 +1,5 @@
-
-
-INSERT INTO app.users VALUES(0, '1980-01-01 00:00:00', 0, 'admin', 'password', 'admin@gmail.com', '{"+7-800-555-35-35", "+7-777-777-77-77"}', '{}');
+INSERT INTO app.users VALUES(0, 'admin', 'password', 'admin@gmail.com', '{"+7-800-555-35-35", "+7-777-777-77-77"}', '{}',
+                            0, '1980-01-01 00:00:00');
 
 INSERT INTO app.events VALUES
     (0, '1980-01-01 00:00:12', 2, '{"Term" : "NewTerm", "Description" : "Some text"}'),

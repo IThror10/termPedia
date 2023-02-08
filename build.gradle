@@ -90,7 +90,6 @@ configure([webModule]) {
         implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
         implementation 'org.springframework.boot:spring-boot-starter-security'
 
-//        implementation 'io.projectreactor:reactor-core'
         implementation "io.jsonwebtoken:jjwt-api:0.11.1"
         implementation "io.jsonwebtoken:jjwt-impl:0.11.1"
         implementation "io.jsonwebtoken:jjwt-jackson:0.11.1"
@@ -120,20 +119,9 @@ dependencies {
     allureAggregateReport dbModule
 //    allureAggregateReport webModule
     allureAggregateReport project
-
-//    test {
-//        useJUnitPlatform()
-//    }
 }
 
 tasks.create("unitTests").configure {
-    blModule.test.configure {
-        ignoreFailures = true
-    }
-
-    dbModule.test.configure {
-        ignoreFailures = true
-    }
     dependsOn(dbModule.test)
     dependsOn(blModule.test)
 }
@@ -178,7 +166,7 @@ testing {
 }
 
 check.dependsOn(integrationTests)
-test.mustRunAfter(integrationTests)
+integrationTests.mustRunAfter(test)
 test.configure {
     mustRunAfter(blModule.check)
     mustRunAfter(dbModule.check)

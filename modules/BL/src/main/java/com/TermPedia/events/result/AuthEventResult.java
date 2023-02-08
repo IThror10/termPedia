@@ -1,15 +1,15 @@
 package com.TermPedia.events.result;
 
-import com.TermPedia.dto.users.UserPublicData;
+import com.TermPedia.dto.users.UserPrivateData;
 
 public class AuthEventResult extends EventResult {
-    private final UserPublicData data;
+    private final UserPrivateData data;
 
-    public AuthEventResult(UserPublicData data) {
+    public AuthEventResult(UserPrivateData data) {
         this.data = data;
     }
 
-    public UserPublicData getUserData() {
+    public UserPrivateData getUserData() {
         return data;
     }
 }
