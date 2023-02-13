@@ -3,11 +3,12 @@ package com.TermPedia.factory.query;
 import com.TermPedia.dto.exceptions.ActionsException;
 import com.TermPedia.factory.adapters.ISearchAdapter;
 import com.TermPedia.factory.query.common.LitTypesRequests;
-import com.TermPedia.queries.instances.IByNameGetSettings;
-import com.TermPedia.queries.instances.types.LitTypesQueryResult;
+import com.TermPedia.queries.litTypes.FindLitTypesByNameQuery;
+import com.TermPedia.queries.results.litType.LitTypesQueryResult;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class StatementLitTypesSearcher implements LitTypesSearcher {
@@ -21,14 +22,13 @@ public class StatementLitTypesSearcher implements LitTypesSearcher {
         this.searcher = searcher;
     }
     @Override
-    public LitTypesQueryResult getLitTypesByName(IByNameGetSettings settings) throws ActionsException {
+    public LitTypesQueryResult getLitTypesByName(FindLitTypesByNameQuery settings) throws ActionsException {
+        String query = builder.getLitTypesByNameQuery(settings);
         try {
-            String query = builder.getLitTypesByNameQuery(settings);
-            Vector<String> litTypes = new Vector<>(settings.getSearchAmount());
-
-            if (searcher.execute(query))
-                while (searcher.next())
-                    litTypes.add(searcher.getString("name"));
+            List<String> litTypes = new ArrayList<>(settings.getSearchAmount());
+            searcher.execute(query);
+            while (searcher.next())
+                litTypes.add(searcher.getString("name"));
             return new LitTypesQueryResult(litTypes);
         } catch (ActionsException e) {
             throw e;

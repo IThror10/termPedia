@@ -1,10 +1,8 @@
 package com.TermPedia.factory.query.postgres;
 
-import com.TermPedia.dto.Term;
-import com.TermPedia.events.EventType;
+import com.TermPedia.commands.events.EventType;
 import com.TermPedia.factory.command.EventData;
-import com.TermPedia.factory.query.postgres.PostgresTermsRequests;
-import com.TermPedia.queries.instances.terms.FindTermByNameQuery;
+import com.TermPedia.queries.terms.FindTermByNameQuery;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,29 +10,15 @@ import static org.junit.jupiter.api.Assertions.*;
 class PostgresTermsRequestsTest {
 
     @Test
-    void getTermsByNameQuery() throws Exception {
+    void getTermsByNameQuery() {
         //Arrange
         PostgresTermsRequests requests = new PostgresTermsRequests();
-        FindTermByNameQuery settings = new FindTermByNameQuery("NAME", 8, 2);
-        String expected = "SELECT terms.name, terms.description FROM data.terms WHERE lower(name) = lower('NAME') or " +
-                "plainto_tsquery('NAME') @@ vector ORDER BY name LIMIT 8 OFFSET 2";
+        FindTermByNameQuery settings = new FindTermByNameQuery(2, 8, "NAME");
+        String expected = "SELECT terms.tid, terms.name, terms.description FROM data.terms WHERE lower(name) = lower('NAME') or " +
+                "plainto_tsquery('NAME') @@ vector ORDER BY name LIMIT 2 OFFSET 8";
 
         //Act
         String query = requests.getTermsByNameQuery(settings);
-
-        //Assert
-        assertEquals(expected, query);
-    }
-
-    @Test
-    void termsExists() {
-        //Arrange
-        PostgresTermsRequests requests = new PostgresTermsRequests();
-        Term term = new Term("NAME", "description");
-        String expected = "SELECT EXISTS (SELECT name FROM data.terms WHERE name = 'NAME');";
-
-        //Act
-        String query = requests.termsExists(term);
 
         //Assert
         assertEquals(expected, query);
@@ -57,7 +41,7 @@ class PostgresTermsRequestsTest {
     void addLitToTermQuery() {
         //Arrange
         PostgresTermsRequests requests = new PostgresTermsRequests();
-        EventData data = new EventData("{JSON}", EventType.new_lit.ordinal(), 0);
+        EventData data = new EventData("{JSON}", EventType.new_term_lit.ordinal(), 0);
         String expected = "call data.add_lit_term('{JSON}');";
 
         //Act

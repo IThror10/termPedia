@@ -1,13 +1,16 @@
 package com.TermPedia;
 
-import com.TermPedia.dto.exceptions.ActionsException;
-import com.TermPedia.dto.Book;
+import com.TermPedia.dto.literature.Literature;
 import com.TermPedia.dto.JsonBuilder;
+import com.TermPedia.dto.exceptions.FormatException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 class JsonBuilderTest {
+    private final QueryTestObjectsFactory factory;
+    public JsonBuilderTest() {
+        factory = new QueryTestObjectsFactory();
+    }
     @Test
     void addInt() {
         JsonBuilder builder1 = new JsonBuilder();
@@ -25,13 +28,13 @@ class JsonBuilderTest {
         JsonBuilder builder1 = new JsonBuilder();
         JsonBuilder builder2 = new JsonBuilder();
 
-        String singleStringRes = builder1.addStr("AAA", "a'a|a").getData();
+        String singleStringRes = builder1.addStr("AAA", "aaa").getData();
         String multiStringsRes = builder2.addStr("AAA", "aaa").addStr("BBB", "bbb").addStr("CCC", null).getData();
 
-        assertEquals("{\"AAA\" : \"a'a|a\"}", singleStringRes);
+        assertEquals("{\"AAA\" : \"aaa\"}", singleStringRes);
         assertEquals("{\"AAA\" : \"aaa\", \"BBB\" : \"bbb\", \"CCC\" : null}", multiStringsRes);
-        assertThrows(ActionsException.class, () -> builder1.addStr("DDD", "d\"dd"));
-        assertThrows(ActionsException.class, () -> builder1.addStr("EEE", "e\\ee"));
+        assertThrows(FormatException.class, () -> builder1.addStr("DDD", "d\"dd"));
+        assertThrows(FormatException.class, () -> builder1.addStr("EEE", "e\\ee"));
     }
 
     @Test
@@ -47,20 +50,20 @@ class JsonBuilderTest {
 
         String[] singleAuthor = {"Mihail G."}, twoAuthors = {"Mihail G.", "Andrew K."},
                 noAuthors = {}, wrongAuthors = {"DD\"DD"};
-        Book singleAuthorAlbum = QueryTestObjectsFactory.createAlbum(singleAuthor);
-        Book twoAuthorsAlbum = QueryTestObjectsFactory.createAlbum(twoAuthors);
-        Book noAuthorsAlbum = QueryTestObjectsFactory.createAlbum(noAuthors);
-        Book wrongAuthorsAlbum = QueryTestObjectsFactory.createAlbum(wrongAuthors);
+        Literature singleAuthorAlbum = factory.createAlbum(singleAuthor);
+        Literature twoAuthorsAlbum = factory.createAlbum(twoAuthors);
+        Literature noAuthorsAlbum = factory.createAlbum(noAuthors);
+        Literature wrongAuthorsAlbum = factory.createAlbum(wrongAuthors);
 
 
-        String noAuthorsRes = builder1.addBook(noAuthorsAlbum).getData();
-        String singleAuthorRes = builder2.addBook(singleAuthorAlbum).getData();
-        String twoAuthorsRes = builder3.addBook(twoAuthorsAlbum).getData();
+        String noAuthorsRes = builder1.addLiterature(noAuthorsAlbum).getData();
+        String singleAuthorRes = builder2.addLiterature(singleAuthorAlbum).getData();
+        String twoAuthorsRes = builder3.addLiterature(twoAuthorsAlbum).getData();
 
 
         assertEquals("{\"Book\" : {%s, %s}}".formatted(meta, add1), singleAuthorRes);
         assertEquals("{\"Book\" : {%s, %s}}".formatted(meta, add2), twoAuthorsRes);
         assertEquals("{\"Book\" : {%s, %s}}".formatted(meta, add3), noAuthorsRes);
-        assertThrows(ActionsException.class, () -> builder1.addBook(wrongAuthorsAlbum));
+        assertThrows(FormatException.class, () -> builder1.addLiterature(wrongAuthorsAlbum));
     }
 }

@@ -1,7 +1,7 @@
 package com.TermPedia.factory.command;
 
 import com.TermPedia.dto.exceptions.ActionsException;
-import com.TermPedia.factory.BaseProvider;
+import com.TermPedia.factory.provider.BaseProvider;
 import com.TermPedia.factory.command.common.ISynchronizer;
 import org.jetbrains.annotations.NotNull;
 

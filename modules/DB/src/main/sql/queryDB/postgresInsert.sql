@@ -1,32 +1,29 @@
-INSERT INTO data.users values (1);
-INSERT INTO data.users values (2);
+-- Users
+call data.add_user(0);
 
 -- Terms
 call data.add_term('{"Term" : "OOP", "Description" : "Object Oriented Programming"}');
 call data.add_term('{"Term" : "Singleton", "Description" : "Single object pattern"}');
 
--- Terms Tags Connection
-INSERT INTO data.terms_tags values('OOP', 'IT');
-INSERT INTO data.terms_tags values('OOP', 'Medicine');
-INSERT INTO data.terms_tags values('OOP', 'Pattern');
-INSERT INTO data.terms_tags values('Singleton', 'Pattern');
-INSERT INTO data.terms_tags values('Singleton', 'AntiPattern');
+-- Lit
+call data.add_lit('{"Book" : {"Name" : "Go4", "Type" : "book", "Year" : 2010, "Authors" : ["ABCD", "DEF"]}}');
+call data.add_lit('{"Book" : {"Name" : "White Fang", "Type" : "Novel", "Year" : 1906, "Authors" : ["London J."]}}');
 
--- Books
-INSERT INTO data.lit values('Go4', 2010, 'book', '["ABC", "DEF"]');
-INSERT INTO data.lit values('White Fang', 1906, 'Novel', '["London J."]');
-
--- Terms Lit Connection
-INSERT INTO data.terms_lit values('Singleton', 'Go4');
-INSERT INTO data.terms_lit values('OOP', 'Go4');
-
--- Terms Tags Rates
-INSERT INTO data.term_tag_rates values(1, 'OOP', 'IT', 5);
-INSERT INTO data.term_tag_rates values(1, 'OOP', 'Pattern', 4);
-INSERT INTO data.term_tag_rates values(1, 'Singleton', 'Pattern', 4);
-INSERT INTO data.term_tag_rates values(1, 'Singleton', 'AntiPattern', 5);
-INSERT INTO data.term_tag_rates values(2, 'OOP', 'Medicine', 1);
-INSERT INTO data.term_tag_rates values(2, 'OOP', 'IT', 3);
-
-INSERT INTO data.term_lit_rates values(1, 'OOP', 'Go4', 4);
-INSERT INTO data.term_lit_rates values(2, 'Singleton', 'Go4', 3);
+---- Terms Tags Connection
+--call data.add_tag_term('{"TID" : 1, "Tag" : "IT"}');
+--call data.add_tag_term('{"TID" : 1, "Tag" : "Medicine"}');
+--call data.add_tag_term('{"TID" : 1, "Tag" : "Pattern"}');
+--call data.add_tag_term('{"TID" : 2, "Tag" : "Pattern"}');
+--call data.add_tag_term('{"TID" : 2, "Tag" : "Anti Pattern"}');
+--
+---- Terms Lit Connection
+--call data.add_lit_term('{"TID" : 1, "LID" : 1}');
+--call data.add_lit_term('{"TID" : 2, "LID" : 1}');
+--call data.add_lit_term('{"TID" : 1, "LID" : 2}');
+--
+---- Terms Lit Rates
+--call data.rate_lit_term('{"TID" : 1, "LID" : 1, "Mark" : 2}', 0);
+--call data.rate_lit_term('{"TID" : 1, "LID" : 1, "Mark" : 5}', 0);
+--
+---- Terms Tags Rates
+--call data.rate_tag_term('{"TID" : 1, "Tag" : "IT", "Mark" : 5}', 0);

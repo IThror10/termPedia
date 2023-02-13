@@ -9,4 +9,5 @@ public interface UpdateRequests {
     String newTagTermPareQuery(EventData data);
     String newRateTermLitQuery(EventData data);
     String newRateTermTagQuery(EventData data);
+    String newLitQuery(EventData data);
 }

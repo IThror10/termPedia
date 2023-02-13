@@ -73,12 +73,12 @@ public class PostgresQueryFactory extends SyncQueryFactory {
     }
 
     @Override
-    public BookSearcher createBookSearcher() throws ActionsException {
+    public LiteratureSearcher createBookSearcher() throws ActionsException {
         try {
             Connection connection = _establisher.establishReaderConnection();
-            return new StatementBookSearcher(
+            return new StatementLiteratureSearcher(
                     new PostgresAdapter(connection),
-                    new PostgresBookRequests()
+                    new PostgresLiteratureRequests()
             );
         } catch (Exception e) {
             logger.warning(e.getMessage());

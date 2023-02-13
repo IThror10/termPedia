@@ -2,7 +2,8 @@ package com.TermPedia.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -22,25 +23,23 @@ public class SecurityConfig{
     @Bean
     public SecurityFilterChain securityWebFilterChain(HttpSecurity http) throws Exception {
         return http
-//                .exceptionHandling()
-//                .authenticationEntryPoint(controller)
+                .exceptionHandling()
+                .authenticationEntryPoint((req, res, authExp) -> res.setStatus(HttpStatus.UNAUTHORIZED.value()))
 //                .accessDeniedHandler(handler)
-//                .and()
+                .and()
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers("/api/v1/user/login").permitAll()
-                                .requestMatchers("/api/v1/user/register").permitAll()
-                                .requestMatchers("/greeting").authenticated()
-                                .requestMatchers("/api/v1/user/logout").authenticated()
-                                .anyRequest().permitAll()
-//                        .requestMatchers(HttpMethod.POST, "/api/v1/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/user").permitAll()
+                        .requestMatchers("/api/v1/user/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/term/**").hasAuthority("VISITOR")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/**").authenticated()
+                        .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
 //                .formLogin().disable()
 //                .httpBasic().disable()
-//                .httpBasic(Customizer.withDefaults())
+                .httpBasic(Customizer.withDefaults())
                 .build();
     }
 

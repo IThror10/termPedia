@@ -1,34 +1,38 @@
 CREATE SCHEMA if NOT EXISTS data;
 CREATE TABLE IF NOT EXISTS data.terms (
-    name varchar(50) PRIMARY KEY,
-    description text,
-    vector tsvector NOT NULL,
-    TermID serial UNIQUE);
+    name varchar(50) NOT NULL,
+    description text NOT NULL,
+    vector tsvector,
+    TID serial PRIMARY KEY,
+
+    UNIQUE(name, description)
+);
 Create Index idx_terms_gin ON data.terms USING GIN (vector);
 Create Index idx_terms_lower ON data.terms (lower(name));
 
 CREATE TABLE IF NOT EXISTS data.tags (
     name varchar(50) UNIQUE,
-    vector tsvector,
-    TagID serial UNIQUE);
+    vector tsvector
+);
 Create Index idx_tag_gin ON data.tags USING GIN (vector);
 Create Index idx_tag_lower ON data.tags (lower(name));
 INSERT INTO data.tags values(NULL, NULL);
 
 CREATE TABLE IF NOT EXISTS data.authors (
-    name varchar(50) PRIMARY KEY,
-    AuthorID serial UNIQUE);
+    name varchar(50) PRIMARY KEY
+);
 
 CREATE TABLE IF NOT EXISTS data.lit_types (
     name varchar(50) PRIMARY KEY,
-    vector tsvector NOT NULL,
-    TypeID serial UNIQUE);
+    vector tsvector NOT NULL
+);
 Create Index idx_littype_gin ON data.lit_types USING GIN (vector);
 Create Index idx_littype_lower ON data.lit_types (lower(name));
 
 CREATE TABLE IF NOT EXISTS data.users (
     UID int PRIMARY KEY,
-    CHECK (UID >= 0));
+    CHECK (UID >= 0)
+);
 
 CREATE TABLE IF NOT EXISTS data.lit (
     name varchar(50) NOT NULL,
@@ -40,31 +44,32 @@ CREATE TABLE IF NOT EXISTS data.lit (
 
     UNIQUE (name, year, type, authors),
     PRIMARY KEY (LID),
-    FOREIGN KEY (type) REFERENCES data.lit_types (name));
+    FOREIGN KEY (type) REFERENCES data.lit_types (name)
+);
 Create Index idx_lit_gin ON data.lit USING GIN (vector);
 Create Index idx_lit_lower ON data.lit (lower(name));
 
 
 CREATE TABLE IF NOT EXISTS data.terms_tags (
-    term varchar(50) NOT NULL,
+    TID int NOT NULL,
     tag varchar(50),
     rates_amount int NOT NULL DEFAULT 0,
     rates_sum int NOT NULL DEFAULT 0,
     rating real NOT NULL DEFAULT 0,
 
-    UNIQUE (term, tag),
-    FOREIGN KEY (term) REFERENCES data.terms (name),
+    UNIQUE (TID, tag),
+    FOREIGN KEY (TID) REFERENCES data.terms (TID),
     FOREIGN KEY (tag) REFERENCES data.tags (name));
 
 CREATE TABLE IF NOT EXISTS data.terms_lit (
-    term varchar(50) NOT NULL,
+    TID int NOT NULL,
     LID int NOT NULL,
     rates_amount int NOT NULL DEFAULT 0,
     rates_sum int NOT NULL DEFAULT 0,
     rating real NOT NULL DEFAULT 0,
 
-    UNIQUE (term, LID),
-    FOREIGN KEY (term) REFERENCES data.terms(name),
+    UNIQUE (TID, LID),
+    FOREIGN KEY (TID) REFERENCES data.terms(TID),
     FOREIGN KEY (LID) REFERENCES data.lit(LID));
 
 CREATE TABLE IF NOT EXISTS data.authors_lit (
@@ -77,24 +82,25 @@ CREATE TABLE IF NOT EXISTS data.authors_lit (
 
 CREATE TABLE IF NOT EXISTS data.term_tag_rates (
     UID int NOT NULL,
-    term varchar(50) NOT NULL,
+    TID int NOT NULL,
     tag varchar(50),
     rating int NOT NULL,
 
-    UNIQUE (UID, term, tag),
+    CONSTRAINT single_mark_tag UNIQUE (UID, TID, tag),
     FOREIGN KEY (UID) REFERENCES data.users (UID),
-    FOREIGN KEY (term, tag) REFERENCES data.terms_tags (term, tag),
-    CHECK (rating >= 0 and rating <= 5));
+    CONSTRAINT tid_tag_exist FOREIGN KEY (TID, tag) REFERENCES data.terms_tags (TID, tag),
+    CHECK (rating >= 0 and rating <= 5)
+);
 
 CREATE TABLE IF NOT EXISTS data.term_lit_rates (
     UID int NOT NULL,
-    term varchar(50) NOT NULL,
+    TID int NOT NULL,
     LID int NOT NULL,
     rating int NOT NULL,
 
-    UNIQUE (UID, term, LID),
+    CONSTRAINT single_mark_lit UNIQUE (UID, TID, LID),
     FOREIGN KEY (UID) REFERENCES data.users (UID),
-    FOREIGN KEY (term, LID) REFERENCES data.terms_lit (term, LID),
+    CONSTRAINT tid_lid_exist FOREIGN KEY (TID, LID) REFERENCES data.terms_lit (TID, LID),
     CHECK (rating >= 0 and rating <= 5)
 );
 
@@ -148,7 +154,7 @@ Create or Replace Function data.on_new_term_tag()
 AS $Body$ Begin
     INSERT INTO data.book_search
         SELECT tl.LID, l.name, l.year, l.type, l.authors, new.tag
-            FROM data.terms_lit tl join data.lit l on tl.term = new.term and l.lid = tl.lid
+            FROM data.terms_lit tl join data.lit l on tl.TID = new.TID and l.lid = tl.lid
         ON CONFLICT DO NOTHING;
     return new;
 End $Body$ language plpgsql;
@@ -163,7 +169,7 @@ AS $Body$ Begin
     -- Change Tag Rating
     with lit_tag_rating(lit_id, tag_rating) as
         (SELECT tl.LID, max(tl.rating * tt.rating / 5)
-            FROM data.terms_lit tl join data.terms_tags tt on tt.tag = new.tag and tt.term = tl.term
+            FROM data.terms_lit tl join data.terms_tags tt on tt.tag = new.tag and tt.TID = tl.TID
                 GROUP BY tl.LID)
     UPDATE data.book_search
         SET rating = tag_rating
@@ -183,7 +189,7 @@ AS $Body$ Begin
     -- Associate book with new tags
     INSERT INTO data.book_search
         SELECT l.LID, l.name, l.year, l.type, l.authors, tt.tag
-            FROM data.lit l join data.terms_tags tt on l.LID = new.LID and tt.term = new.term
+            FROM data.lit l join data.terms_tags tt on l.LID = new.LID and tt.TID = new.TID
         ON CONFLICT DO NOTHING;
     return new;
 End $Body$ language plpgsql;
@@ -198,8 +204,8 @@ AS $Body$ Begin
     -- Change Tag Rating
     with lit_tag_rating (tag_name, tag_rating) as
         (SELECT tt.tag, max(tl.rating * tt.rating / 5) as rating
-            FROM data.terms_lit tl join data.terms_tags tt on tl.lid = new.lid and tt.term = tl.term
-                and tt.tag in (SELECT tag FROM data.terms_tags WHERE term = new.term)
+            FROM data.terms_lit tl join data.terms_tags tt on tl.lid = new.lid and tt.TID = tl.TID
+                and tt.tag in (SELECT tag FROM data.terms_tags WHERE TID = new.TID)
             GROUP BY tt.tag)
     UPDATE data.book_search
         SET rating = tag_rating
@@ -237,11 +243,11 @@ AS $Body$ Begin
     IF (TG_OP = 'INSERT') then
         UPDATE data.terms_lit
         SET (rates_amount, rates_sum) = (rates_amount + 1, rates_sum + new.rating)
-            WHERE lid = new.lid and term = new.term;
+            WHERE lid = new.lid and TID = new.TID;
     ELSE
         UPDATE data.terms_lit
         SET rates_sum = rates_sum + new.rating - old.rating
-            WHERE lid = new.lid and term = new.term;
+            WHERE lid = new.lid and TID = new.TID;
     END IF;
     return new;
 End $Body$ language plpgsql;
@@ -258,11 +264,11 @@ AS $Body$ Begin
     IF (TG_OP = 'INSERT') then
         UPDATE data.terms_tags
         SET (rates_amount, rates_sum) = (rates_amount + 1, rates_sum + new.rating)
-            WHERE term = new.term and tag = new.tag;
+            WHERE TID = new.TID and tag = new.tag;
     ELSE
         UPDATE data.terms_tags
         SET rates_sum = rates_sum + new.rating - old.rating
-            WHERE term = new.term and tag = new.tag;
+            WHERE TID = new.TID and tag = new.tag;
     END IF;
     return new;
 End $Body$ language plpgsql;

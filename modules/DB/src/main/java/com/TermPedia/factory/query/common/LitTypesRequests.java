@@ -1,8 +1,8 @@
 package com.TermPedia.factory.query.common;
 
 import com.TermPedia.dto.exceptions.ActionsException;
-import com.TermPedia.queries.instances.IByNameGetSettings;
+import com.TermPedia.queries.litTypes.FindLitTypesByNameQuery;
 
 public interface LitTypesRequests {
-    String getLitTypesByNameQuery(IByNameGetSettings settings) throws ActionsException;
+    String getLitTypesByNameQuery(FindLitTypesByNameQuery query) throws ActionsException;
 }

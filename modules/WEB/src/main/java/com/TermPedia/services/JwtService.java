@@ -2,7 +2,7 @@ package com.TermPedia.services;
 
 import com.TermPedia.dto.users.UserPrivateData;
 import com.TermPedia.dto.users.UserPublicData;
-import com.TermPedia.events.user.ValidateEvent;
+import com.TermPedia.commands.user.ValidateCommand;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -12,14 +12,16 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.*;
+import java.util.logging.Logger;
 
 @Service
 public class JwtService {
     private static final String SECRET_KEY = "FXJaNdRgUkXp2s5v8x/AzDlG+KbPeShVqQDZqOVaUKAd";
 
-    public ValidateEvent getValidateEvent(String jwt) {
+    public ValidateCommand getValidateCommand(String jwt) {
+        Logger.getLogger("Auth").warning(jwt);
         final Claims claims = extractAllClaims(jwt);
-        return new ValidateEvent(
+        return new ValidateCommand(
                 claims.getSubject(),
                 claims.get("secret", String.class)
         );
@@ -27,7 +29,7 @@ public class JwtService {
 
     public String generateToken(UserPrivateData user) {
         Map<String, Object> map = new HashMap();
-        map.put("secret", user.secret());
+        map.put("secret", user.getSecret());
         return generateToken(map, user);
     }
 
@@ -35,7 +37,7 @@ public class JwtService {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
-                .setSubject(user.login())
+                .setSubject(user.getLogin())
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

@@ -1,40 +1,30 @@
 package com.TermPedia.factory.query.postgres;
 
 import com.TermPedia.dto.exceptions.ActionsException;
-import com.TermPedia.dto.Term;
 import com.TermPedia.factory.command.EventData;
-import com.TermPedia.factory.query.common.AssertByNameGetSettings;
+import com.TermPedia.factory.query.common.BaseQuerySettingsAssert;
 import com.TermPedia.factory.query.common.TermsRequests;
-import com.TermPedia.queries.instances.IByNameGetSettings;
+import com.TermPedia.queries.terms.FindTermByNameQuery;
 
-public class PostgresTermsRequests extends AssertByNameGetSettings implements TermsRequests {
+public class PostgresTermsRequests extends BaseQuerySettingsAssert implements TermsRequests {
     private final StringBuilder builder;
     public PostgresTermsRequests() {
         builder = new StringBuilder(256);
     }
 
     @Override
-    public String getTermsByNameQuery(IByNameGetSettings settings) throws ActionsException {
-        assertCorrect(settings);
+    public String getTermsByNameQuery(FindTermByNameQuery settings) throws ActionsException {
+        assertSelectCorrect(settings.getSearchAmount(), settings.getSkipAmount());
 
         builder.setLength(0);
-        builder.append("SELECT terms.name, terms.description FROM data.terms WHERE lower(name) = lower('");
-        builder.append(settings.getName());
+        builder.append("SELECT terms.tid, terms.name, terms.description FROM data.terms WHERE lower(name) = lower('");
+        builder.append(settings.getTermNameWildcard());
         builder.append("') or plainto_tsquery('");
-        builder.append(settings.getName());
+        builder.append(settings.getTermNameWildcard());
         builder.append("') @@ vector ORDER BY name LIMIT ");
         builder.append(settings.getSearchAmount());
         builder.append(" OFFSET ");
         builder.append(settings.getSkipAmount());
-        return builder.toString();
-    }
-
-    @Override
-    public String termsExists(Term term) {
-        builder.setLength(0);
-        builder.append("SELECT EXISTS (SELECT name FROM data.terms WHERE name = '");
-        builder.append(term.name);
-        builder.append("');");
         return builder.toString();
     }
 

@@ -1,6 +1,5 @@
 package com.TermPedia.factory.adapters;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface ISearchAdapter {
@@ -10,5 +9,6 @@ public interface ISearchAdapter {
     String getString(String key) throws Exception;
     boolean getBoolean(String key) throws Exception;
     double getDouble(String key) throws Exception;
-    List<String> getStringList(String key) throws Exception;
+    List<String> getStringArray(String key) throws Exception;
+    List<String> getJsonArray(String key) throws Exception;
 }

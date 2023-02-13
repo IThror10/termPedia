@@ -1,15 +1,14 @@
 package com.TermPedia.factory.query.common;
 
 import com.TermPedia.dto.exceptions.ActionsException;
-import com.TermPedia.queries.books.BaseSearchBookByAuthorNameQuery;
-import com.TermPedia.queries.books.BaseSearchBookByBookNameQuery;
-import com.TermPedia.queries.books.BaseSearchBookByTagQuery;
-import com.TermPedia.queries.books.BaseSearchBookByTermQuery;
+import com.TermPedia.queries.lit.*;
+import com.TermPedia.queries.user.UserTermLitRatingQuery;
 
 public interface BooksRequests {
-    String authorSearchQuery(BaseSearchBookByAuthorNameQuery query) throws ActionsException;
-    String bookSearchQuery(BaseSearchBookByBookNameQuery query) throws ActionsException;
-    String anySearchQuery(BaseSearchBookByTagQuery query) throws ActionsException;
-    String termSearchQuery(BaseSearchBookByTermQuery query) throws ActionsException;
-    String connectedTermsSearchQuery(BaseSearchBookByTermQuery query) throws ActionsException;
+    String authorSearchQuery(FindLitByAuthorNameQuery settings) throws ActionsException;
+    String bookSearchQuery(FindLitByLikeNameQuery settings) throws ActionsException;
+    String anySearchQuery(FindLitByTagQuery settings) throws ActionsException;
+    String termSearchQuery(FindLitByLikeTermNameQuery settings) throws ActionsException;
+    String termIdSearchQuery(FindLitByTermIdQuery settings) throws ActionsException;
+    String userTermLitRatingQuery(UserTermLitRatingQuery settings) throws ActionsException;
 }

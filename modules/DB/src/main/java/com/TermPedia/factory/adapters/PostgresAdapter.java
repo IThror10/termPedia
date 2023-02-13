@@ -62,16 +62,26 @@ public class PostgresAdapter implements ISyncAdapter, ISearchAdapter{
     }
 
     @Override
-    public List<String> getStringList(String key) throws Exception {
+    public List<String> getStringArray(String key) throws Exception {
         String source = resultSet.getString(key);
         List<String> list = new ArrayList<>();
 
-        if (source == null || source.length() < 3)
+        if (source == null)
             return list;
 
-        for (String res: source.substring(1, source.length() - 1).split(","))
-            list.add(res);
+        int i = 0, j = 0;
+        while (i >= 0 && j >= 0) {
+            i = source.indexOf("\"", j + 1);
+            j = source.indexOf("\"", i + 1);
+            if (i > 0 && j > 0)
+                list.add(source.substring(i + 1, j));
+        }
         return list;
+    }
+
+    @Override
+    public List<String> getJsonArray(String key) throws Exception {
+        return null;
     }
 
     @Override

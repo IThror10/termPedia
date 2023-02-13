@@ -1,7 +1,7 @@
 package com.TermPedia.factory.command.common;
 
-import com.TermPedia.events.BaseEvent;
+import com.TermPedia.commands.events.DataEvent;
 
 public interface IEventHandlerRequests {
-    String acceptEventQuery(BaseEvent event);
+    String acceptEventQuery(DataEvent event);
 }

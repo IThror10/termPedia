@@ -1,6 +1,6 @@
 package com.TermPedia;
 
-import com.TermPedia.factory.ConstProvider;
+import com.TermPedia.factory.provider.ConstProvider;
 import com.TermPedia.factory.command.SyncCommandFactory;
 import com.TermPedia.factory.command.postgres.PostgresCommandConnection;
 import com.TermPedia.factory.command.postgres.PostgresCommandFactory;

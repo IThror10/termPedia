@@ -49,15 +49,15 @@ public class StatementUpdater implements IUpdater {
         }
     }
 
-    private String createQuery(EventData data) throws Exception {
+    private String createQuery(EventData data) {
         return switch (data.type) {
             case registration -> builder.newUserQuery(data);
             case change_term_lit_rating -> builder.newRateTermLitQuery(data);
             case change_term_tag_rating -> builder.newRateTermTagQuery(data);
             case new_term -> builder.newTermQuery(data);
-            case new_tag -> builder.newTagTermPareQuery(data);
-            case new_lit -> builder.newLitTermPareQuery(data);
-            case authorization -> throw new Exception("Authorization event");
+            case new_lit -> builder.newLitQuery(data);
+            case new_term_tag -> builder.newTagTermPareQuery(data);
+            case new_term_lit -> builder.newLitTermPareQuery(data);
         };
     }
     @Override

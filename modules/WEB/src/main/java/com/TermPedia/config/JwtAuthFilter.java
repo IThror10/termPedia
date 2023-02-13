@@ -1,7 +1,6 @@
 package com.TermPedia.config;
 
-import com.TermPedia.dto.users.User;
-import com.TermPedia.events.user.ValidateEvent;
+import com.TermPedia.commands.user.ValidateCommand;
 import com.TermPedia.services.JwtService;
 import com.TermPedia.services.UserService;
 import jakarta.servlet.FilterChain;
@@ -11,8 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -42,12 +39,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         else {
             final String jwt = authHeader.substring(7);
-            ValidateEvent event = jwtService.getValidateEvent(jwt);
+            ValidateCommand command = jwtService.getValidateCommand(jwt);
 
-            if (event.login != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                if (userService.checkValid(event)) {
+            if (command.login != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                if (userService.checkValid(command)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            event.login,
+                            command.login,
                             null,
                             null
                     );
@@ -55,7 +52,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
 
-                    request.setAttribute("uid", event.getResult().getUserData().userId());
+                    request.setAttribute("uid", command.getResult().getData().getUserId());
                 }
             }
             filterChain.doFilter(request, response);

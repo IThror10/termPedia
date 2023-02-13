@@ -1,9 +1,9 @@
 package com.TermPedia.factory.command;
 
 
+import com.TermPedia.commands.result.EventResult;
 import com.TermPedia.dto.exceptions.ActionsException;
-import com.TermPedia.events.result.EventStatus;
-import com.TermPedia.events.data.DataEvent;
+import com.TermPedia.commands.events.DataEvent;
 import com.TermPedia.factory.adapters.ISearchAdapter;
 import com.TermPedia.factory.command.common.IEventHandlerRequests;
 import org.jetbrains.annotations.NotNull;
@@ -22,17 +22,15 @@ public class StatementEventHandler implements EventHandler {
     }
 
     @Override
-    public EventStatus accept(@NotNull DataEvent event) throws ActionsException {
-        if (event.uid == null)
+    public EventResult accept(@NotNull DataEvent event) throws ActionsException {
+        if (event.getUid() == null)
             throw new ActionsException("You need to be logged in");
 
         String query = builder.acceptEventQuery(event);
         try {
-            if (searcher.execute(query)) {
-                searcher.next();
-                return new EventStatus(searcher.getBoolean("accept_event"));
-            }
-            return new EventStatus(false);
+            searcher.execute(query);
+            searcher.next();
+            return new EventResult(searcher.getString("accept_event"));
         } catch (Exception e) {
             logger.warning(e.getMessage());
             throw new ActionsException("Something went wrong. Try again later.");
