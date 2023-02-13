@@ -50,6 +50,6 @@ public class Literature {
         if (lid == null)
             throw new ActionsException("LiteratureId expected");
         else
-            this.lid = 5;
+            this.lid = lid;
     }
 }

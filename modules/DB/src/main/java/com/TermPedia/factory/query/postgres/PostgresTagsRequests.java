@@ -20,9 +20,9 @@ public class PostgresTagsRequests extends BaseQuerySettingsAssert implements Tag
         assertSelectCorrect(settings.getSearchAmount(), settings.getSkipAmount());
 
         builder.setLength(0);
-        builder.append("SELECT name FROM data.tags WHERE lower(name) = lower('");
+        builder.append("SELECT name FROM data.tags WHERE lower(name) like lower('");
         builder.append(settings.getName());
-        builder.append("') or plainto_tsquery('");
+        builder.append("%') or plainto_tsquery('");
         builder.append(settings.getName());
         builder.append("') @@ vector ORDER BY name LIMIT ");
         builder.append(settings.getSearchAmount());
@@ -37,7 +37,7 @@ public class PostgresTagsRequests extends BaseQuerySettingsAssert implements Tag
 
 
         builder.setLength(0);
-        builder.append("SELECT tid, tag, rates_amount FROM data.terms_tags tt WHERE tid = ");
+        builder.append("SELECT tag, rating, rates_amount FROM data.terms_tags tt WHERE tid = ");
         builder.append(settings.getTermId());
 
         if (settings.isSearchNew())

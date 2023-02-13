@@ -18,17 +18,19 @@ public class PostgresLiteratureRequests extends BookQuerySettingsAssert implemen
     @Override
     public String authorSearchQuery(FindLitByAuthorNameQuery settings) throws ActionsException {
         assertSelectCorrect(settings.getSearchAmount(), settings.getSkipAmount());
+        assertYearsCorrect(settings.getYearStart(), settings.getYearEnd());
 
         builder.setLength(0);
-        builder.append("SELECT DISTINCT l.name, l.type, l.year, l.authors FROM (SELECT name FROM data.authors WHERE lower(name) like lower('%");
+        builder.append("SELECT DISTINCT l.lid, l.name, l.type, l.year, l.authors FROM (SELECT name FROM data.authors WHERE lower(name) like lower('%");
         builder.append(settings.getAuthorWildcard());
         builder.append("%')) as a JOIN data.authors_lit al on a.name = al.author JOIN data.lit l on l.lid = al.lid WHERE l.year >= ");
         builder.append(settings.getYearStart());
         builder.append(" and l.year <= ");
         builder.append(settings.getYearEnd());
         if (settings.getLitType() != null) {
-            builder.append(" and l.type = ");
+            builder.append(" and l.type = '");
             builder.append(settings.getLitType());
+            builder.append("'");
         }
         builder.append(" ORDER BY l.name LIMIT ");
         builder.append(settings.getSearchAmount());

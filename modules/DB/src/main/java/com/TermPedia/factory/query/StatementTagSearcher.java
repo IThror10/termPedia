@@ -76,7 +76,7 @@ public class StatementTagSearcher implements TagsSearcher {
             searcher.execute(query);
             while (searcher.next())
                 ratings.add(new UserRating(
-                        searcher.getInt("tag"),
+                        searcher.getString("tag"),
                         searcher.getInt("rating")
                 ));
             return new UserRatingResult(ratings);

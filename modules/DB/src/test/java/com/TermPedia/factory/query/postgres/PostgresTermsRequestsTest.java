@@ -14,7 +14,7 @@ class PostgresTermsRequestsTest {
         //Arrange
         PostgresTermsRequests requests = new PostgresTermsRequests();
         FindTermByNameQuery settings = new FindTermByNameQuery(2, 8, "NAME");
-        String expected = "SELECT terms.tid, terms.name, terms.description FROM data.terms WHERE lower(name) = lower('NAME') or " +
+        String expected = "SELECT terms.tid, terms.name, terms.description FROM data.terms WHERE lower(name) like lower('NAME%') or " +
                 "plainto_tsquery('NAME') @@ vector ORDER BY name LIMIT 2 OFFSET 8";
 
         //Act

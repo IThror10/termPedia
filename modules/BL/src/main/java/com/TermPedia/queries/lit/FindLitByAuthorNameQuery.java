@@ -16,8 +16,8 @@ public class FindLitByAuthorNameQuery implements IQuery {
     private LiteratureQueryResult result;
 
     private String litType = null;
-    private int yearStart = 3000;
-    private int yearEnd = -3000;
+    private int yearStart = -3000;
+    private int yearEnd = 3000;
 
     private final int searchAmount;
     private final int skipAmount;

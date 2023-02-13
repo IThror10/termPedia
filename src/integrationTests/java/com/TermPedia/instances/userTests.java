@@ -23,8 +23,8 @@ import org.junit.jupiter.api.function.Executable;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class userTests {
-    userTests() {
+public class UserTests {
+    UserTests() {
         PostgresQueryFactory.completeRegistration();
         PostgresQueryFactory.setConnectionEstablisher(new PostgresTestQueryConnection());
         SyncQueryFactory.setProvider(new ConstProvider("postgres"));

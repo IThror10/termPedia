@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class AddLitEvent extends DataEvent {
-    protected AddLitEvent(
+    public AddLitEvent(
             @Nullable Integer userId,
             @NotNull Literature literature
     ) throws FormatException {

@@ -17,9 +17,9 @@ public class PostgresTermsRequests extends BaseQuerySettingsAssert implements Te
         assertSelectCorrect(settings.getSearchAmount(), settings.getSkipAmount());
 
         builder.setLength(0);
-        builder.append("SELECT terms.tid, terms.name, terms.description FROM data.terms WHERE lower(name) = lower('");
+        builder.append("SELECT terms.tid, terms.name, terms.description FROM data.terms WHERE lower(name) like lower('");
         builder.append(settings.getTermNameWildcard());
-        builder.append("') or plainto_tsquery('");
+        builder.append("%') or plainto_tsquery('");
         builder.append(settings.getTermNameWildcard());
         builder.append("') @@ vector ORDER BY name LIMIT ");
         builder.append(settings.getSearchAmount());

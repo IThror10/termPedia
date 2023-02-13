@@ -16,7 +16,7 @@ class PostgresTagsRequestsTest {
         //Arrange
         PostgresTagsRequests requests = new PostgresTagsRequests();
         FindTagByNameQuery settings = new FindTagByNameQuery(5, 10, "NAME");
-        String expected = "SELECT name FROM data.tags WHERE lower(name) = lower('NAME') or plainto_tsquery('NAME') " +
+        String expected = "SELECT name FROM data.tags WHERE lower(name) like lower('NAME%') or plainto_tsquery('NAME') " +
                 "@@ vector ORDER BY name LIMIT 5 OFFSET 10";
 
         //Act
@@ -32,12 +32,12 @@ class PostgresTagsRequestsTest {
 
         FindTagByTermIdQuery recentlySettings = new FindTagByTermIdQuery
                 (5, 12, 13,true);
-        String recentlyExpected = "SELECT tid, tag, rates_amount FROM data.terms_tags tt " +
+        String recentlyExpected = "SELECT tag, rating, rates_amount FROM data.terms_tags tt " +
                 "WHERE tid = 13 ORDER BY rates_amount, tt.rating DESC LIMIT 5 OFFSET 12";
 
         FindTagByTermIdQuery bestSettings = new FindTagByTermIdQuery
                 (5, 12, 13, false);
-        String bestExpected = "SELECT tid, tag, rates_amount FROM data.terms_tags tt " +
+        String bestExpected = "SELECT tag, rating, rates_amount FROM data.terms_tags tt " +
                 "WHERE tid = 13 ORDER BY tt.rating DESC, rates_amount DESC LIMIT 5 OFFSET 12";
 
         //Act

@@ -23,14 +23,14 @@ class PostgresLiteratureRequestsTest {
         withType.setYearStart(2000);
         withType.setYearEnd(3000);
 
-        String expectedNoType = "SELECT DISTINCT l.name, l.type, l.year, l.authors FROM (SELECT name FROM data.authors " +
+        String expectedNoType = "SELECT DISTINCT l.lid, l.name, l.type, l.year, l.authors FROM (SELECT name FROM data.authors " +
                 "WHERE lower(name) like lower('%NAME%')) as a JOIN data.authors_lit al on a.name = al.author " +
                 "JOIN data.lit l on l.lid = al.lid WHERE l.year >= 2000 and l.year <= 3000 " +
                 "ORDER BY l.name LIMIT 10 OFFSET 5";
 
-        String expectedType = "SELECT DISTINCT l.name, l.type, l.year, l.authors FROM (SELECT name FROM data.authors " +
+        String expectedType = "SELECT DISTINCT l.lid, l.name, l.type, l.year, l.authors FROM (SELECT name FROM data.authors " +
                 "WHERE lower(name) like lower('%NAME%')) as a JOIN data.authors_lit al on a.name = al.author " +
-                "JOIN data.lit l on l.lid = al.lid WHERE l.year >= 2000 and l.year <= 3000 and l.type = TYPE " +
+                "JOIN data.lit l on l.lid = al.lid WHERE l.year >= 2000 and l.year <= 3000 and l.type = 'TYPE' " +
                 "ORDER BY l.name LIMIT 10 OFFSET 5";
 
         //Act

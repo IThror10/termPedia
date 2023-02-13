@@ -119,7 +119,7 @@ END $BODY$ language plpgsql SECURITY DEFINER;
 
     -- EventHandler.acceptEvent()
 Create or Replace Function app.accept_event(in_uid integer, in_datetime timestamp, in_type integer, in_data jsonb)
-    Returns boolean
+    Returns varchar(100)
 AS $BODY$
 Declare
     event_uid int;
@@ -127,10 +127,10 @@ Begin
     SELECT users.eventType FROM app.users WHERE users.UID = in_uid INTO event_uid;
     IF event_uid = 0 THEN
         INSERT INTO app.Events VALUES (in_uid, in_datetime, in_type, in_data);
-        return true;
+        return login from app.users where uid = in_uid;
     ELSEIF event_uid is NULL THEN
         RAISE NOTICE 'User % is Not allowed To do <<%>> Command With Data <<%>>', in_uid, in_type, in_data;
     ELSE
-        return false;
+        return null::varchar(100);
     END IF;
 END $BODY$ language plpgsql SECURITY DEFINER;
