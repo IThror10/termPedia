@@ -191,18 +191,11 @@ public class PostgresLiteratureRequests extends BookQuerySettingsAssert implemen
     @Override
     public String termIdSearchQuery(FindLitByTermIdQuery settings) throws ActionsException {
         assertSelectCorrect(settings.getSearchAmount(), settings.getSkipAmount());
-        assertYearsCorrect(settings.getYearStart(), settings.getYearEnd());
 
         builder.setLength(0);
         builder.append("SELECT l.lid, l.name, l.type, l.year, l.authors, tl.rating, tl.rates_amount ");
         builder.append("FROM data.terms_lit tl JOIN data.lit l on tl.lid = l.lid and tl.tid = ");
         builder.append(settings.getTermId());
-        builder.append(" and tl.rating >= ");
-        builder.append(settings.getMinRating());
-        builder.append(" and year >= ");
-        builder.append(settings.getYearStart());
-        builder.append(" and year <= ");
-        builder.append(settings.getYearEnd());
 
         if (settings.getOrderByRating() && settings.getRecentlyAdded())
             builder.append(" ORDER BY tl.rates_amount, tl.rating DESC");
@@ -221,12 +214,13 @@ public class PostgresLiteratureRequests extends BookQuerySettingsAssert implemen
     @Override
     public String userTermLitRatingQuery(UserTermLitRatingQuery settings) throws ActionsException {
         builder.setLength(0);
-        builder.append("SELECT lid, rating FROM data.term_lit_rates WHERE uid = ");
-        builder.append(settings.getUserID());
-        builder.append(" and lid = ");
-        builder.append(settings.getLitID());
-        builder.append(" and tid = ");
-        builder.append(settings.getTermID());
+        builder.append("SELECT * FROM data.term_lit_rating(");
+        builder.append(settings.getUserId());
+        builder.append(", ");
+        builder.append(settings.getTermId());
+        builder.append(", ");
+        builder.append(settings.getLitId());
+        builder.append(")");
         return builder.toString();
     }
 

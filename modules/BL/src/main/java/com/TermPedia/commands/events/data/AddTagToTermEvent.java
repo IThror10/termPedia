@@ -5,14 +5,13 @@ import com.TermPedia.commands.events.EventType;
 import com.TermPedia.dto.exceptions.ActionsException;
 import com.TermPedia.dto.exceptions.FormatException;
 import com.TermPedia.commands.CommandVisitor;
-import com.TermPedia.dto.tags.Tag;
 import org.jetbrains.annotations.NotNull;
 import com.TermPedia.dto.JsonBuilder;
 
 public class AddTagToTermEvent extends DataEvent {
     public AddTagToTermEvent(
             @NotNull Integer termId,
-            @NotNull Tag tag,
+            @NotNull String tag,
             Integer userId
     ) throws FormatException {
         super(userId, EventType.new_term_tag);
@@ -21,7 +20,7 @@ public class AddTagToTermEvent extends DataEvent {
         else {
             this.data = new JsonBuilder(128)
                     .addInt("TID", termId)
-                    .addStr("Tag", tag.getName())
+                    .addStr("Tag", tag)
                     .getData();
         }
     }

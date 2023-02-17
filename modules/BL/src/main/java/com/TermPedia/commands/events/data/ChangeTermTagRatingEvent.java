@@ -5,7 +5,6 @@ import com.TermPedia.commands.events.EventType;
 import com.TermPedia.dto.exceptions.ActionsException;
 import com.TermPedia.dto.exceptions.FormatException;
 import com.TermPedia.commands.CommandVisitor;
-import com.TermPedia.dto.tags.Tag;
 import org.jetbrains.annotations.NotNull;
 import com.TermPedia.dto.JsonBuilder;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +13,7 @@ public class ChangeTermTagRatingEvent extends DataEvent {
     public ChangeTermTagRatingEvent(
             @Nullable Integer userId,
             @NotNull Integer termId,
-            @NotNull Tag tag,
+            @NotNull String tag,
             int mark
     ) throws FormatException {
         super(userId, EventType.change_term_tag_rating);
@@ -25,7 +24,7 @@ public class ChangeTermTagRatingEvent extends DataEvent {
         else {
             this.data = new JsonBuilder(128)
                     .addInt("TID", termId)
-                    .addStr("Tag", tag.getName())
+                    .addStr("Tag", tag)
                     .addInt("Mark", mark)
                     .getData();
         }

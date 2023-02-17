@@ -24,6 +24,7 @@ import com.TermPedia.queries.terms.FindTermByNameQuery;
 import com.TermPedia.queries.user.UserTermTagRatingQuery;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -67,7 +68,7 @@ public class TagsTests {
         UserRatingResult result = query.getResult();
 
         //Assert
-        assertEquals(5, result.getResult().get(0).getUserRating());
+        assertEquals(5, result.getRating().getUserRating());
     }
 
     private void findTagByName(String tag) {
@@ -106,7 +107,7 @@ public class TagsTests {
 
     private void changeTermTagRating(Integer tid, String tag) {
         //Arrange
-        ChangeTermTagRatingEvent event = new ChangeTermTagRatingEvent(0, tid, new Tag(tag), 5);
+        ChangeTermTagRatingEvent event = new ChangeTermTagRatingEvent(0, tid, tag, 5);
         CommandHandler handler = new CommandHandler();
 
         //Act
@@ -125,7 +126,7 @@ public class TagsTests {
 
         //Arrange
         Integer termId = term.getResult().getTerms().get(0).getTid();
-        AddTagToTermEvent event = new AddTagToTermEvent(termId, new Tag(tag), 0);
+        AddTagToTermEvent event = new AddTagToTermEvent(termId, tag, 0);
         CommandHandler handler = new CommandHandler();
 
         //Act

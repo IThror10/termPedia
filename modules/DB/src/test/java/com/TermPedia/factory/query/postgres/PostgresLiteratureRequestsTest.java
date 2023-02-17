@@ -182,7 +182,6 @@ class PostgresLiteratureRequestsTest {
 
     @Test
     void termIdSearchQueryTest() {
-
         //Arrange
         PostgresLiteratureRequests requests = new PostgresLiteratureRequests();
 
@@ -190,30 +189,27 @@ class PostgresLiteratureRequestsTest {
                 (5, 6, 7);
         bestSettings.setOrderByRating(true);
         bestSettings.setRecentlyAdded(false);
-        bestSettings.setMinRating(3.0);
 
         String bestWithTypeExpected = "SELECT l.lid, l.name, l.type, l.year, l.authors, tl.rating, tl.rates_amount " +
-                "FROM data.terms_lit tl JOIN data.lit l on tl.lid = l.lid and tl.tid = 7 and tl.rating >= 3.0 and " +
-                "year >= -3000 and year <= 3000 ORDER BY tl.rating DESC LIMIT 5 OFFSET 6";
+                "FROM data.terms_lit tl JOIN data.lit l on tl.lid = l.lid and tl.tid = 7" +
+                " ORDER BY tl.rating DESC LIMIT 5 OFFSET 6";
 
         FindLitByTermIdQuery recentlySettings = new FindLitByTermIdQuery
                 (5, 6, 7);
         recentlySettings.setOrderByRating(false);
         recentlySettings.setRecentlyAdded(true);
-        recentlySettings.setMinRating(3.0);
         String recentlyExpected = "SELECT l.lid, l.name, l.type, l.year, l.authors, tl.rating, tl.rates_amount " +
-                "FROM data.terms_lit tl JOIN data.lit l on tl.lid = l.lid and tl.tid = 7 and tl.rating >= 3.0 and " +
-                "year >= -3000 and year <= 3000 ORDER BY tl.rates_amount LIMIT 5 OFFSET 6";
+                "FROM data.terms_lit tl JOIN data.lit l on tl.lid = l.lid and tl.tid = 7" +
+                " ORDER BY tl.rates_amount LIMIT 5 OFFSET 6";
 
         FindLitByTermIdQuery bothSettings = new FindLitByTermIdQuery
                 (5, 6, 7);
         bothSettings.setOrderByRating(true);
         bothSettings.setRecentlyAdded(true);
-        bothSettings.setMinRating(3.0);
 
         String bothExpected = "SELECT l.lid, l.name, l.type, l.year, l.authors, tl.rating, tl.rates_amount " +
-                "FROM data.terms_lit tl JOIN data.lit l on tl.lid = l.lid and tl.tid = 7 and tl.rating >= 3.0 and " +
-                "year >= -3000 and year <= 3000 ORDER BY tl.rates_amount, tl.rating DESC LIMIT 5 OFFSET 6";
+                "FROM data.terms_lit tl JOIN data.lit l on tl.lid = l.lid and tl.tid = 7" +
+                " ORDER BY tl.rates_amount, tl.rating DESC LIMIT 5 OFFSET 6";
 
         //Act
         String bestWithTypeQuery = requests.termIdSearchQuery(bestSettings);
@@ -230,7 +226,7 @@ class PostgresLiteratureRequestsTest {
     void userTermLitRatingQuery() {
         //Arrange
         UserTermLitRatingQuery settings = new UserTermLitRatingQuery(0, 2, 1);
-        String expect = "SELECT lid, rating FROM data.term_lit_rates WHERE uid = 0 and lid = 1 and tid = 2";
+        String expect = "SELECT * FROM data.term_lit_rating(0, 2, 1)";
         PostgresLiteratureRequests builder = new PostgresLiteratureRequests();
 
         //Act

@@ -94,7 +94,7 @@ public class LitTests {
         UserRatingResult result = query.getResult();
 
         //Assert
-        assertEquals(1, result.getResult().get(0).getUserRating());
+        assertEquals(1, result.getRating().getUserRating());
     }
 
     private void changeTermLitRating(Integer tid, Integer lid) {

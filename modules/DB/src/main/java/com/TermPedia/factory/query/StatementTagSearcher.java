@@ -1,6 +1,7 @@
 package com.TermPedia.factory.query;
 
 import com.TermPedia.dto.exceptions.ActionsException;
+import com.TermPedia.dto.exceptions.NotFoundException;
 import com.TermPedia.dto.tags.RatedTag;
 import com.TermPedia.dto.tags.Tag;
 import com.TermPedia.dto.users.UserRating;
@@ -72,14 +73,21 @@ public class StatementTagSearcher implements TagsSearcher {
     public UserRatingResult getUserTermTagRating(UserTermTagRatingQuery settings) throws ActionsException {
         String query = builder.userTermTagRating(settings);
         try {
-            List<UserRating> ratings = new ArrayList<>();
             searcher.execute(query);
-            while (searcher.next())
-                ratings.add(new UserRating(
-                        searcher.getString("tag"),
-                        searcher.getInt("rating")
-                ));
-            return new UserRatingResult(ratings);
+            searcher.next();
+            int status = searcher.getInt("status");
+
+            if (status == -1)
+                throw new NotFoundException("Tag-TermId connection doesn't exist");
+            else {
+                return new UserRatingResult(
+                        new UserRating(
+                                settings.getTermId(),
+                                settings.getTag(),
+                                searcher.getInt("rating")
+                        )
+                );
+            }
         } catch (ActionsException e) {
             throw e;
         } catch (Exception e) {

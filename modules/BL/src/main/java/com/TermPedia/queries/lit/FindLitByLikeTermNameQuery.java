@@ -4,6 +4,7 @@ import  com.TermPedia.dto.exceptions.ActionsException;
 import com.TermPedia.queries.IQuery;
 import com.TermPedia.queries.results.lit.RatedLiteratureQueryResult;
 import com.TermPedia.queries.QueryVisitor;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class FindLitByLikeTermNameQuery implements IQuery {
     private RatedLiteratureQueryResult result;
 

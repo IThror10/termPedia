@@ -42,6 +42,11 @@ public class PostgresAdapter implements ISyncAdapter, ISearchAdapter{
     }
 
     @Override
+    public int getSize() throws Exception {
+        return resultSet.getFetchSize();
+    }
+
+    @Override
     public int getInt(String key) throws Exception {
         return resultSet.getInt(key);
     }

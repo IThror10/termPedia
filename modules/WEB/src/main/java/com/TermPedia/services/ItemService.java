@@ -6,7 +6,7 @@ import com.TermPedia.queries.tags.FindTagByNameQuery;
 import com.TermPedia.queries.litTypes.FindLitTypesByNameQuery;
 import com.TermPedia.responses.item.AuthorResponse;
 import com.TermPedia.responses.item.LitTypesResponse;
-import com.TermPedia.responses.item.TagResponse;
+import com.TermPedia.responses.tags.TagResponse;
 import org.springframework.stereotype.Service;
 
 @Service

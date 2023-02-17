@@ -30,9 +30,11 @@ public class SecurityConfig{
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/v1/user").permitAll()
-                        .requestMatchers("/api/v1/user/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/term/**").hasAuthority("VISITOR")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/user/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/**").authenticated()
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tags/*/userRatings").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/literature/*/userRatings").authenticated()
                         .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

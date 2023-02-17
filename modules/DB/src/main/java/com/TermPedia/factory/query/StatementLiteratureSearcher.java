@@ -1,6 +1,7 @@
 package com.TermPedia.factory.query;
 
 import com.TermPedia.dto.exceptions.ActionsException;
+import com.TermPedia.dto.exceptions.NotFoundException;
 import com.TermPedia.dto.literature.*;
 import com.TermPedia.dto.users.UserRating;
 import com.TermPedia.factory.adapters.ISearchAdapter;
@@ -126,19 +127,27 @@ public class StatementLiteratureSearcher implements LiteratureSearcher {
     public UserRatingResult getUserTermLitRating(UserTermLitRatingQuery settings) throws ActionsException {
         String query = builder.userTermLitRatingQuery(settings);
         try {
-            List<UserRating> ratings = new ArrayList<>();
             searcher.execute(query);
-            while (searcher.next())
-                ratings.add(new UserRating(
-                    searcher.getInt("lid"),
-                    searcher.getInt("rating")
+            searcher.next();
+            int status = searcher.getInt("status");
+
+            if (status == -1)
+                throw new NotFoundException("Tag-TermId connection doesn't exist");
+            else {
+                return new UserRatingResult(
+                        new UserRating(
+                                settings.getTermId(),
+                                settings.getLitId(),
+                                searcher.getInt("rating")
                 ));
-            return new UserRatingResult(ratings);
+            }
+
         } catch (ActionsException e) {
             throw e;
         } catch (Exception e) {
             logger.warning(e.getMessage());
-            throw new ActionsException("Something went wrong. Try again later.");
+            throw new ActionsException(e.getMessage());
+//            throw new ActionsException("Something went wrong. Try again later.");
         }
     }
 

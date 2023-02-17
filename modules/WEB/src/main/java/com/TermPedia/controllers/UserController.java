@@ -1,6 +1,5 @@
 package com.TermPedia.controllers;
 
-import com.TermPedia.commands.result.EventResult;
 import com.TermPedia.requests.user.AuthorizeRequest;
 import com.TermPedia.requests.user.DataChangeRequest;
 import com.TermPedia.requests.user.LogoutRequest;
@@ -18,6 +17,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+
 
 @RestController
 @RequestMapping("api/v1/user")
@@ -30,11 +31,11 @@ public class UserController {
     @Operation(summary = "Create new user")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200",
+                    responseCode = "201",
                     description = "User created",
                     content = {@Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = EventResponse.class))
+                            schema = @Schema)
                     }),
             @ApiResponse(
                     responseCode = "400",
@@ -45,9 +46,9 @@ public class UserController {
                     description = "Login/Email already used",
                     content = @Content) })
     @PostMapping(produces = { "application/json" }, consumes = { "application/json" })
-    public ResponseEntity register(@RequestBody RegisterRequest request) {
+    public ResponseEntity register(@RequestBody RegisterRequest request) throws Exception {
         EventResponse response = userService.register(request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.created(new URI("api/v1/user/" + response.login)).build();
     }
 
     @Operation(summary = "Change User's public data")

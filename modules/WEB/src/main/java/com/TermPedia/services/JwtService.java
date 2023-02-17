@@ -12,14 +12,12 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.*;
-import java.util.logging.Logger;
 
 @Service
 public class JwtService {
     private static final String SECRET_KEY = "FXJaNdRgUkXp2s5v8x/AzDlG+KbPeShVqQDZqOVaUKAd";
 
     public ValidateCommand getValidateCommand(String jwt) {
-        Logger.getLogger("Auth").warning(jwt);
         final Claims claims = extractAllClaims(jwt);
         return new ValidateCommand(
                 claims.getSubject(),

@@ -7,6 +7,8 @@ import com.TermPedia.queries.tags.FindTagByTermIdQuery;
 import com.TermPedia.queries.user.UserTermTagRatingQuery;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class PostgresTagsRequestsTest {
@@ -81,7 +83,7 @@ class PostgresTagsRequestsTest {
     void userTermTagRatingTest() {
         //Arrange
         UserTermTagRatingQuery settings = new UserTermTagRatingQuery(0, 1, "tagName");
-        String expect = "SELECT tag, rating FROM data.term_tag_rates WHERE uid = 0 and tid = 1 and tag = 'tagName'";
+        String expect = "SELECT * FROM data.term_tag_rating(0, 1, 'tagName')";
         PostgresTagsRequests builder = new PostgresTagsRequests();
 
         //Act

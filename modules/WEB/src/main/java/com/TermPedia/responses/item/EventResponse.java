@@ -6,6 +6,5 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class EventResponse {
-    @Schema(example = "{login : user}")
     public final String login;
 }

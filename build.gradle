@@ -157,7 +157,6 @@ testing {
 
                         finalizedBy(dropTestCommandDB)
                         finalizedBy(dropTestQueryDB)
-
                     }
                 }
             }

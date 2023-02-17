@@ -54,13 +54,13 @@ public class PostgresTagsRequests extends BaseQuerySettingsAssert implements Tag
     @Override
     public String userTermTagRating(UserTermTagRatingQuery settings) throws ActionsException {
         builder.setLength(0);
-        builder.append("SELECT tag, rating FROM data.term_tag_rates WHERE uid = ");
+        builder.append("SELECT * FROM data.term_tag_rating(");
         builder.append(settings.getUserId());
-        builder.append(" and tid = ");
+        builder.append(", ");
         builder.append(settings.getTermId());
-        builder.append(" and tag = '");
+        builder.append(", '");
         builder.append(settings.getTag());
-        builder.append("'");
+        builder.append("')");
         return builder.toString();
     }
 
