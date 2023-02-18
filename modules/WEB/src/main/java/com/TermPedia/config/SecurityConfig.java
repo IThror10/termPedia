@@ -1,5 +1,6 @@
 package com.TermPedia.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,13 +13,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig{
     private final JwtAuthFilter filter;
-
-    public SecurityConfig(JwtAuthFilter filter) {
-        this.filter = filter;
-    }
 
     @Bean
     public SecurityFilterChain securityWebFilterChain(HttpSecurity http) throws Exception {
@@ -29,12 +27,12 @@ public class SecurityConfig{
                 .and()
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/v1/user").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/user/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/**").authenticated()
-                        .requestMatchers(HttpMethod.PATCH, "/api/v1/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/tags/*/userRatings").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/literature/*/userRatings").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/user").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/user/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/**").authenticated()
+                        .requestMatchers(HttpMethod.PATCH, "/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/tags/*/userRatings").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/literature/*/userRatings").authenticated()
                         .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -12,7 +12,7 @@ import com.TermPedia.queries.litTypes.FindLitTypesByNameQuery;
 
 import com.TermPedia.responses.lit.*;
 import com.TermPedia.responses.item.*;
-import com.TermPedia.responses.common.MarkResponse;
+import com.TermPedia.responses.user.MarkResponse;
 import com.TermPedia.requests.user.MarkRequest;
 import com.TermPedia.requests.lit.AddLitRequest;
 
@@ -31,7 +31,7 @@ import java.util.Arrays;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/literature")
+@RequestMapping("literature")
 public class LiteratureController {
     private final LitService service;
 
@@ -197,10 +197,10 @@ public class LiteratureController {
     @PostMapping(produces = { "application/json" }, consumes = { "application/json" })
     public ResponseEntity addLit(@RequestBody AddLitRequest request, @RequestAttribute("uid") Integer userId) {
         Literature literature = new Literature(
-                request.name,
-                request.type,
-                request.year,
-                Arrays.asList(request.authors)
+                request.name(),
+                request.type(),
+                request.year(),
+                Arrays.asList(request.authors())
         );
         AddLitEvent event = new AddLitEvent(
                 userId,

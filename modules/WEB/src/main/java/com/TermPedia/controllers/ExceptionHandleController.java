@@ -21,13 +21,13 @@ import java.util.Map;
 public class ExceptionHandleController {
     @ExceptionHandler(FormatException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<String> handleFormatExceptions(ActionsException ex) {
+    public ResponseEntity handleFormatExceptions(ActionsException ex) {
         return createBody(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<String> handleNotFoundException(ActionsException ex) {
+    public ResponseEntity handleNotFoundException(ActionsException ex) {
         return createBody(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 

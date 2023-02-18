@@ -12,7 +12,7 @@ import com.TermPedia.requests.term.AddTagToTermRequest;
 import com.TermPedia.requests.term.AddTermRequest;
 import com.TermPedia.responses.item.RatedTagResponse;
 import com.TermPedia.responses.lit.RatedLiteratureResponse;
-import com.TermPedia.responses.term.TermsResponse;
+import com.TermPedia.responses.entity.TermsResponse;
 import com.TermPedia.services.TermService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,7 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/v1/terms")
+@RequestMapping("terms")
 @RequiredArgsConstructor
 public class TermController {
     private final TermService service;

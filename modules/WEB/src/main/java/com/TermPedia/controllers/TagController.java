@@ -4,8 +4,8 @@ import com.TermPedia.commands.events.data.ChangeTermTagRatingEvent;
 import com.TermPedia.queries.tags.FindTagByNameQuery;
 import com.TermPedia.queries.user.UserTermTagRatingQuery;
 import com.TermPedia.requests.user.MarkRequest;
-import com.TermPedia.responses.tags.TagResponse;
-import com.TermPedia.responses.common.MarkResponse;
+import com.TermPedia.responses.entity.TagResponse;
+import com.TermPedia.responses.user.MarkResponse;
 import com.TermPedia.services.TagService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,18 +13,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/v1/tags")
+@RequiredArgsConstructor
+@RequestMapping("tags")
 public class TagController {
     private final TagService service;
-
-    public TagController(TagService service) {
-        this.service = service;
-    }
 
     @Operation(summary = "Search Tags By Name")
     @ApiResponses(value = {

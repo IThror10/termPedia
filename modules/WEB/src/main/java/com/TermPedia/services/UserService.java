@@ -4,36 +4,23 @@ import com.TermPedia.commands.events.data.RegisterEvent;
 import com.TermPedia.commands.result.EventResult;
 import com.TermPedia.commands.user.AuthorizeCommand;
 import com.TermPedia.commands.user.ChangeContactsCommand;
-import com.TermPedia.dto.exceptions.ActionsException;
 import com.TermPedia.dto.users.UserPrivateData;
 import com.TermPedia.commands.user.*;
 import com.TermPedia.handlers.CommandHandler;
 import com.TermPedia.handlers.QueryHandler;
 import com.TermPedia.queries.user.GetUserPublicDataQuery;
-import com.TermPedia.requests.user.AuthorizeRequest;
-import com.TermPedia.requests.user.DataChangeRequest;
-import com.TermPedia.requests.user.LogoutRequest;
-import com.TermPedia.requests.user.RegisterRequest;
 import com.TermPedia.responses.item.EventResponse;
 import com.TermPedia.responses.user.AuthenticationResponse;
 import com.TermPedia.responses.user.UserPublicDataResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private final JwtService jwtService;
 
-    public UserService(JwtService jwtService) {
-        this.jwtService = jwtService;
-    }
-
-    public EventResponse register(RegisterRequest request) {
-        RegisterEvent event = new RegisterEvent(
-                request.login,
-                request.password,
-                request.email
-        );
-
+    public EventResponse register(RegisterEvent event) {
         CommandHandler handler = new CommandHandler();
         handler.handle(event);
 
@@ -41,47 +28,27 @@ public class UserService {
         return new EventResponse(data.getLogin());
     }
 
-    public UserPublicDataResponse changePublicData(Integer userId, DataChangeRequest request) {
-        ChangeContactsCommand event = new ChangeContactsCommand(
-                userId,
-                request.field(),
-                request.op(),
-                request.getValue()
-        );
-
+    public UserPublicDataResponse changePublicData(ChangeContactsCommand command) {
         CommandHandler handler = new CommandHandler();
-        handler.handle(event);
-        return new UserPublicDataResponse(event.getResult().getData());
+        handler.handle(command);
+        return new UserPublicDataResponse(command.getResult().getData());
     }
 
-    public AuthenticationResponse login(AuthorizeRequest request) {
-        AuthorizeCommand event = new AuthorizeCommand(
-                request.login,
-                request.password
-        );
-
+    public AuthenticationResponse login(AuthorizeCommand command) {
         CommandHandler handler = new CommandHandler();
-        handler.handle(event);
+        handler.handle(command);
 
-        UserPrivateData data = event.getResult().getData();
+        UserPrivateData data = command.getResult().getData();
         String token = jwtService.generateToken(data);
         return new AuthenticationResponse(token, new UserPublicDataResponse(data));
     }
 
-    public void logout(LogoutRequest request) {
-        LogoutCommand event = new LogoutCommand(
-                request.userId()
-        );
-
+    public void logout(LogoutCommand command) {
         CommandHandler handler = new CommandHandler();
-        handler.handle(event);
+        handler.handle(command);
     }
 
-    public UserPublicDataResponse getUserPublicData(String userName) throws ActionsException {
-        GetUserPublicDataQuery query = new GetUserPublicDataQuery(
-                userName
-        );
-
+    public UserPublicDataResponse getUserPublicData(GetUserPublicDataQuery query) {
         QueryHandler handler = new QueryHandler();
         handler.handle(query);
         return new UserPublicDataResponse(query.getResult().getUser());

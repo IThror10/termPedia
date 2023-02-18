@@ -6,4 +6,4 @@ import jakarta.validation.constraints.NotBlank;
 
 public record AddLitToTermRequest(
     @NotBlank @JsonProperty("litId") @Schema(example = "4") Integer litId
-) { }
+) {}

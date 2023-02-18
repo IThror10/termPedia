@@ -6,4 +6,4 @@ import jakarta.validation.constraints.NotBlank;
 
 public record AddTagToTermRequest(
     @NotBlank @JsonProperty("tagName") @Schema(example = "IT") String tag
-) { }
+) {}

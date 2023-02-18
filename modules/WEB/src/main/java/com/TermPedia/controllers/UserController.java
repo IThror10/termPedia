@@ -1,8 +1,13 @@
 package com.TermPedia.controllers;
 
+import com.TermPedia.commands.events.data.RegisterEvent;
+import com.TermPedia.commands.user.AuthorizeCommand;
+import com.TermPedia.commands.user.ChangeContactsCommand;
+import com.TermPedia.commands.user.LogoutCommand;
+import com.TermPedia.handlers.QueryHandler;
+import com.TermPedia.queries.user.GetUserPublicDataQuery;
 import com.TermPedia.requests.user.AuthorizeRequest;
 import com.TermPedia.requests.user.DataChangeRequest;
-import com.TermPedia.requests.user.LogoutRequest;
 import com.TermPedia.requests.user.RegisterRequest;
 import com.TermPedia.responses.item.EventResponse;
 import com.TermPedia.responses.user.AuthenticationResponse;
@@ -14,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,12 +27,10 @@ import java.net.URI;
 
 
 @RestController
-@RequestMapping("api/v1/user")
+@RequiredArgsConstructor
+@RequestMapping("user")
 public class UserController {
     private final UserService userService;
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @Operation(summary = "Create new user")
     @ApiResponses(value = {
@@ -47,8 +51,14 @@ public class UserController {
                     content = @Content) })
     @PostMapping(produces = { "application/json" }, consumes = { "application/json" })
     public ResponseEntity register(@RequestBody RegisterRequest request) throws Exception {
-        EventResponse response = userService.register(request);
-        return ResponseEntity.created(new URI("api/v1/user/" + response.login)).build();
+        RegisterEvent event = new RegisterEvent(
+                request.login(),
+                request.password(),
+                request.email()
+        );
+
+        EventResponse response = userService.register(event);
+        return ResponseEntity.created(new URI("user/" + response.login)).build();
     }
 
     @Operation(summary = "Change User's public data")
@@ -71,7 +81,14 @@ public class UserController {
     @SecurityRequirement(name = "Bearer Authentication")
     @PatchMapping(produces = { "application/json" }, consumes = { "application/json" })
     public ResponseEntity changeData(@RequestBody DataChangeRequest request, @RequestAttribute("uid") Integer userId) {
-        UserPublicDataResponse data = userService.changePublicData(userId, request);
+        ChangeContactsCommand command = new ChangeContactsCommand(
+                userId,
+                request.field(),
+                request.op(),
+                request.getValue()
+        );
+
+        UserPublicDataResponse data = userService.changePublicData(command);
         return ResponseEntity.ok(data);
     }
 
@@ -94,7 +111,12 @@ public class UserController {
                     content = @Content) })
     @PostMapping(value = "/login", produces = { "application/json" }, consumes = { "application/json" })
     public ResponseEntity login(@RequestBody AuthorizeRequest request) {
-        AuthenticationResponse response = userService.login(request);
+        AuthorizeCommand command = new AuthorizeCommand(
+                request.login(),
+                request.password()
+        );
+
+        AuthenticationResponse response = userService.login(command);
         return ResponseEntity.ok(response);
     }
 
@@ -111,8 +133,9 @@ public class UserController {
     @SecurityRequirement(name = "Bearer Authentication")
     @PostMapping("/logout")
     public ResponseEntity logout(@RequestAttribute("uid") Integer userId) {
-        LogoutRequest request = new LogoutRequest(userId);
-        userService.logout(request);
+        LogoutCommand command = new LogoutCommand(userId);
+
+        userService.logout(command);
         return ResponseEntity.noContent().build();
     }
 
@@ -128,10 +151,14 @@ public class UserController {
             @ApiResponse(
                     responseCode = "404",
                     description = "User not found",
-                    content = @Content)})
+                    content = @Content
+            )
+    })
     @GetMapping(value = "/{userLogin}", produces = { "application/json" })
     public ResponseEntity getUser(@PathVariable String userLogin) {
-        UserPublicDataResponse response = userService.getUserPublicData(userLogin);
+        GetUserPublicDataQuery query = new GetUserPublicDataQuery(userLogin);
+
+        UserPublicDataResponse response = userService.getUserPublicData(query);
         return ResponseEntity.ok(response);
     }
 }

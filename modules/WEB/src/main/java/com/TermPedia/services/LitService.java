@@ -11,7 +11,7 @@ import com.TermPedia.queries.litTypes.FindLitTypesByNameQuery;
 
 import com.TermPedia.responses.lit.*;
 import com.TermPedia.responses.item.*;
-import com.TermPedia.responses.common.MarkResponse;
+import com.TermPedia.responses.user.MarkResponse;
 import org.springframework.stereotype.Service;
 
 @Service

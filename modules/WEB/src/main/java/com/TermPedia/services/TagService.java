@@ -6,8 +6,8 @@ import com.TermPedia.handlers.CommandHandler;
 import com.TermPedia.handlers.QueryHandler;
 import com.TermPedia.queries.tags.FindTagByNameQuery;
 import com.TermPedia.queries.user.UserTermTagRatingQuery;
-import com.TermPedia.responses.tags.TagResponse;
-import com.TermPedia.responses.common.MarkResponse;
+import com.TermPedia.responses.entity.TagResponse;
+import com.TermPedia.responses.user.MarkResponse;
 import org.springframework.stereotype.Service;
 
 @Service

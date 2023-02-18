@@ -8,7 +8,7 @@ import com.TermPedia.queries.tags.FindTagByTermIdQuery;
 import com.TermPedia.queries.terms.FindTermByNameQuery;
 import com.TermPedia.responses.item.RatedTagResponse;
 import com.TermPedia.responses.lit.RatedLiteratureResponse;
-import com.TermPedia.responses.term.TermsResponse;
+import com.TermPedia.responses.entity.TermsResponse;
 import org.springframework.stereotype.Service;
 
 @Service
