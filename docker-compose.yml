@@ -1,0 +1,148 @@
+version: "3.2"
+
+services:
+  command-db:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=TermPediaCommand
+    ports:
+      - "5050:5432"
+    volumes:
+      - ./modules/DB/src/main/sql/commandDB/CreatePostgresDB.sql:/docker-entrypoint-initdb.d/init.sql
+
+  query-db:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=TermPediaQuery
+    ports:
+      - "5051:5432"
+    volumes:
+      - ./modules/DB/src/main/sql/queryDB/CreatePostgresDB.sql:/docker-entrypoint-initdb.d/init.sql
+
+  backend-main:
+    build:
+      context: .
+      dockerfile: ./config/main_app.dockerfile
+    restart: on-failure
+    ports:
+      - "8070:8080"
+    depends_on:
+      - command-db
+      - query-db
+    environment:
+      - COMMAND_HOST=command-db
+      - COMMAND_PORT=5432
+      - COMMAND_DB=TermPediaCommand
+      - QUERY_HOST=query-db
+      - QUERY_PORT=5432
+      - QUERY_DB=TermPediaQuery
+      - MAIN_STATUS=update
+
+  backend-read-first:
+    build:
+      context: .
+      dockerfile: ./config/main_app.dockerfile
+    restart: on-failure
+#    ports:
+#      - "8071:8080"
+    depends_on:
+      - command-db
+      - query-db
+    environment:
+      - COMMAND_HOST=command-db
+      - COMMAND_PORT=5432
+      - COMMAND_DB=TermPediaCommand
+      - QUERY_HOST=query-db
+      - QUERY_PORT=5432
+      - QUERY_DB=TermPediaQuery
+
+  backend-read-second:
+    build:
+      context: .
+      dockerfile: ./config/main_app.dockerfile
+    restart: on-failure
+#    ports:
+#      - "8072:8080"
+    depends_on:
+      - command-db
+      - query-db
+    environment:
+      - COMMAND_HOST=command-db
+      - COMMAND_PORT=5432
+      - COMMAND_DB=TermPediaCommand
+      - QUERY_HOST=query-db
+      - QUERY_PORT=5432
+      - QUERY_DB=TermPediaQuery
+
+  mirror-command-db:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=TermPediaCommand
+    ports:
+      - "5053:5432"
+    volumes:
+    - ./modules/DB/src/main/sql/commandDB/CreatePostgresDB.sql:/docker-entrypoint-initdb.d/init.sql
+
+  mirror-query-db:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=TermPediaQuery
+    ports:
+      - "5054:5432"
+    volumes:
+      - ./modules/DB/src/main/sql/queryDB/CreatePostgresDB.sql:/docker-entrypoint-initdb.d/init.sql
+
+  mirror-backend-main:
+    build:
+      context: .
+      dockerfile: ./config/main_app.dockerfile
+    restart: on-failure
+    ports:
+      - "8075:8080"
+    depends_on:
+      - mirror-command-db
+      - mirror-query-db
+    environment:
+      - COMMAND_HOST=mirror-command-db
+      - COMMAND_PORT=5432
+      - COMMAND_DB=TermPediaCommand
+      - QUERY_HOST=mirror-query-db
+      - QUERY_PORT=5432
+      - QUERY_DB=TermPediaQuery
+      - MAIN_STATUS=update
+
+  pgadmin:
+    image: 'dpage/pgadmin4'
+    environment:
+#      - SCRIPT_NAME=/pgadmin4
+      - PGADMIN_DEFAULT_EMAIL=erik.skom@yandex.ru
+      - PGADMIN_DEFAULT_PASSWORD=12345
+      - traefik.frontend.pgadmin4.rule=Host(`host.example.com`) && PathPrefix(`/pgadmin4`)
+    ports:
+      - "6060:80"
+
+  nginx:
+    image: 'byjg/nginx-extras:master'
+    ports:
+      - "9091:9091"
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf
+      - ./modules/WEB/src/main/resources/static:/usr/share/nginx/static
+    depends_on:
+      - backend-main
+      - backend-read-first
+      - backend-read-second
+      - mirror-backend-main
+      - pgadmin

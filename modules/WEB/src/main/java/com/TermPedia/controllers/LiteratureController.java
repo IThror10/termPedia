@@ -31,7 +31,7 @@ import java.util.Arrays;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("literature")
+@RequestMapping("api/literature")
 public class LiteratureController {
     private final LitService service;
 

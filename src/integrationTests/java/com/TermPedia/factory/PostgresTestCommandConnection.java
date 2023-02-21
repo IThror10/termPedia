@@ -1,15 +1,15 @@
 package com.TermPedia.factory;
 
-import com.TermPedia.factory.command.common.ICommandConnection;
+import com.TermPedia.factory.command.postgres.PostgresCommandConnection;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 
-public class PostgresTestCommandConnection implements ICommandConnection {
+public class PostgresTestCommandConnection extends PostgresCommandConnection {
     @Override
     public Connection establishEventHandlerConnection() throws Exception {
         return DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5432/TestTermPediaCommand",
+                postgresUrl,
                 "command_test_authorized",
                 "write_only"
         );
@@ -18,7 +18,7 @@ public class PostgresTestCommandConnection implements ICommandConnection {
     @Override
     public Connection establishReqAuthHandlerConnection() throws Exception {
         return DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5432/TestTermPediaCommand",
+                postgresUrl,
                 "command_test_access",
                 "read_only"
         );
@@ -27,7 +27,7 @@ public class PostgresTestCommandConnection implements ICommandConnection {
     @Override
     public Connection establishSyncConnection() throws Exception {
         return DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5432/TestTermPediaCommand",
+                postgresUrl,
                 "command_test_synchronizer",
                 "sync"
         );

@@ -13,139 +13,22 @@
     </script>
 </head>
 <body>
-<header>
-    <h1>TermPedia</h1>
-    <nav>
-        <ul>
-            <li><a href="#">Authorization</a></li>
-            <li><a href="#">Logout</a></li>
-            <li><a href="#">Registration</a></li>
-        </ul>
-    </nav>
-</header>
-<main>
-    <section id="search-section">
-        <h2>Search</h2>
-        <form>
-            <label for="search-by">Search by:</label>
-            <select name="search-by" id="search-by">
-                <option value="title">Title</option>
-                <option value="author">Author</option>
-                <option value="term">Term</option>
-            </select>
-            <label for="search-string">Search string:</label>
-            <input type="text" id="search-string" name="search-string">
-            <label for="search-dropdown">Dropdown:</label>
-            <select name="search-dropdown" id="search-dropdown"></select>
-            <br>
-            <input type="checkbox" name="search-best" id="search-best">
-            <label for="search-best">Search best</label>
-            <input type="checkbox" name="search-new" id="search-new">
-            <label for="search-new">Search for new ones</label>
-            <br>
-            <label for="search-years">Interval of search years:</label>
-            <input type="text" id="search-years" name="search-years">
-            <br>
-            <label for="search-tags">Search tags:</label>
-            <input type="text" id="search-tags" name="search-tags">
-            <button type="button" id="add-tag-btn">Add tag</button>
-            <ul id="search-tags-list"></ul>
-            <button type="submit" id="search-btn">Search</button>
-        </form>
-        <ul id="search-results"></ul>
-    </section>
-    <section id="side-section">
-        <h2>Term search</h2>
-        <label for="term-search">Term name:</label>
-        <input type="text" id="term-search" name="term-search">
-        <button type="button" id="term-search-btn">Search</button>
-        <div id="term-description"></div>
-        <h3>Tags</h3>
-        <ul id="tags-list"></ul>
-        <div id="tags-pagination"></div>
-        <h3>Literature</h3>
-        <ul id="literature-list"></ul>
-        <div id="literature-pagination"></div>
-    </section>
-</main>
-<footer>
-    <p>&copy; 2023 TermPedia. All rights reserved.</p>
-</footer>
+    <header>
+        <h1>TermPedia</h1>
+        <nav>
+            <ul>
+                <li><a href="#">Authorization</a></li>
+                <li><a href="#">Logout</a></li>
+                <li><a href="#">Registration</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div>
+        <h1>Однажды здесь будет Front</h1>
+        <img src="./img/intro.jpg" width="50%" height="auto">
+    </div>
+    <footer>
+        <p>&copy; 2023 TermPedia. All rights reserved.</p>
+    </footer>
 <script src="script.js"></script>
 </body>
-<!--<body>-->
-<!--<header>-->
-<!--    <h1>Page Title</h1>-->
-<!--    <nav>-->
-<!--        <ul>-->
-<!--            <li><a href="#">Login</a></li>-->
-<!--            <li><a href="#">Registration</a></li>-->
-<!--            <li><a href="#">Logout</a></li>-->
-<!--        </ul>-->
-<!--    </nav>-->
-<!--</header>-->
-<!--<main>-->
-<!--    <section class="search">-->
-<!--        <h2>Search</h2>-->
-<!--        <select>-->
-<!--            <option>Result 1</option>-->
-<!--            <option>Result 2</option>-->
-<!--            <option>Result 3</option>-->
-<!--        </select>-->
-<!--        <ul class="results">-->
-<!--            <li>Result 1</li>-->
-<!--            <li>Result 2</li>-->
-<!--            <li>Result 3</li>-->
-<!--        </ul>-->
-<!--        <div class="pagination">-->
-<!--            <a href="#">Prev</a>-->
-<!--            <a href="#">1</a>-->
-<!--            <a href="#">2</a>-->
-<!--            <a href="#">3</a>-->
-<!--            <a href="#">Next</a>-->
-<!--        </div>-->
-<!--        <div class="checkboxes">-->
-<!--            <label><input type="checkbox" name="best">Search best</label>-->
-<!--            <label><input type="checkbox" name="new">Search new</label>-->
-<!--        </div>-->
-<!--        <div class="year-interval">-->
-<!--            <label>From:</label><input type="text" name="from-year">-->
-<!--            <label>To:</label><input type="text" name="to-year">-->
-<!--        </div>-->
-<!--        <div class="filters">-->
-<!--            <h3>Filters</h3>-->
-<!--            <form>-->
-<!--                <label>Keyword:</label><input type="text" name="keyword">-->
-<!--                <label>Type:</label><select name="type">-->
-<!--                <option>All</option>-->
-<!--                <option>Type 1</option>-->
-<!--                <option>Type 2</option>-->
-<!--            </select>-->
-<!--                <label>Country:</label><select name="country">-->
-<!--                <option>All</option>-->
-<!--                <option>Country 1</option>-->
-<!--                <option>Country 2</option>-->
-<!--            </select>-->
-<!--                <button type="submit">Search</button>-->
-<!--                <button type="reset">Reset</button>-->
-<!--            </form>-->
-<!--        </div>-->
-<!--    </section>-->
-<!--</main>-->
-<!--<aside>-->
-<!--    <section class="search">-->
-<!--        <h2>Search</h2>-->
-<!--        <form>-->
-<!--            <label>Name:</label><input type="text" name="name">-->
-<!--            <label>Description:</label><input type="text" name="description">-->
-<!--            <button type="submit">Search</button>-->
-<!--            <button type="reset">Reset</button>-->
-<!--        </form>-->
-<!--        <ul class="results">-->
-<!--            <li>Result 1</li>-->
-<!--            <li>Result 2</li>-->
-<!--            <li>Result 3</li>-->
-<!--        </ul>-->
-<!--    </section>-->
-<!--</aside>-->
-<!--</body>-->

@@ -41,8 +41,7 @@ public class StatementReqAuthHandler implements UserCommandHandler {
             throw e;
         } catch (Exception e) {
             logger.warning(e.getMessage());
-//            throw new ActionsException("Something went wrong. Try again later.");
-            throw new ActionsException(query);
+            throw new ActionsException("Something went wrong. Try again later.");
         }
     }
 

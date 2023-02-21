@@ -4,12 +4,16 @@ import com.TermPedia.factory.provider.ConstProvider;
 import com.TermPedia.factory.command.SyncCommandFactory;
 import com.TermPedia.factory.command.postgres.PostgresCommandConnection;
 import com.TermPedia.factory.command.postgres.PostgresCommandFactory;
+import com.TermPedia.factory.provider.EnvProvider;
 import com.TermPedia.factory.query.IUpdater;
 import com.TermPedia.factory.query.SyncQueryFactory;
 import com.TermPedia.factory.query.postgres.PostgresQueryConnection;
 import com.TermPedia.factory.query.postgres.PostgresQueryFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.Objects;
+import java.util.logging.Logger;
 
 @SpringBootApplication
 public class WebMain {
@@ -26,8 +30,16 @@ public class WebMain {
         PostgresQueryFactory.setProvider(new ConstProvider("postgres"));
 
         //Create Updater Thread
-        Thread sync = new Thread() {
-            public void run() {
+        start_sync_if_needed();
+
+        //App Start Execution
+        SpringApplication.run(WebMain.class, args);
+    }
+
+    private static void start_sync_if_needed() {
+        if (Objects.equals(System.getenv("MAIN_STATUS"), "update"))
+        {
+            Thread sync = new Thread(() -> {
                 try {
                     IUpdater updater = SyncQueryFactory.instance().createUpdater();
                     updater.setSynchronizer(SyncCommandFactory.instance().createSynchronizer());
@@ -35,20 +47,18 @@ public class WebMain {
                         Thread.sleep(5000);
                         try {
                             updater.update();
-                        } catch (Exception err) {
-
-                        }
+                        } catch (Exception err) {}
                     }
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
-            }
-        };
+            });
 
-
-        //App Start Execution
-        sync.start();
-        SpringApplication.run(WebMain.class, args);
+            //App Start Execution
+            sync.start();
+        } else {
+            Logger.getLogger("app").warning("No updater Set");
+        }
     }
 
 }

@@ -7,9 +7,7 @@ plugins {
 
     id 'io.qameta.allure-aggregate-report' version '2.11.1'
     id 'io.qameta.allure-adapter' version '2.11.1'
-
 }
-
 
 repositories {
     mavenCentral()
@@ -33,8 +31,6 @@ configure([blModule, dbModule, webModule]) {
     apply(plugin: 'idea')
     apply(plugin: 'io.spring.dependency-management')
     apply(plugin: 'io.qameta.allure-adapter')
-
-    sourceCompatibility = JavaVersion.VERSION_18
 
     dependencyManagement {
         imports {
