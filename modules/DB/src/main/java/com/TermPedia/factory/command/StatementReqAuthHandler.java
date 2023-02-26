@@ -42,6 +42,8 @@ public class StatementReqAuthHandler implements UserCommandHandler {
         } catch (Exception e) {
             logger.warning(e.getMessage());
             throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
         }
     }
 
@@ -61,6 +63,8 @@ public class StatementReqAuthHandler implements UserCommandHandler {
         } catch (Exception e) {
             logger.warning(e.getMessage());
             throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
         }
     }
 
@@ -83,6 +87,8 @@ public class StatementReqAuthHandler implements UserCommandHandler {
         } catch (Exception e) {
             logger.warning(e.getMessage());
             throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
         }
     }
 
@@ -98,6 +104,8 @@ public class StatementReqAuthHandler implements UserCommandHandler {
         } catch (Exception e) {
             logger.warning(e.getMessage());
             throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
         }
     }
 
@@ -118,6 +126,8 @@ public class StatementReqAuthHandler implements UserCommandHandler {
         } catch (Exception e) {
             logger.warning(e.getMessage());
             throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
         }
     }
 
@@ -134,6 +144,8 @@ public class StatementReqAuthHandler implements UserCommandHandler {
         } catch (Exception e) {
             logger.warning(e.getMessage());
             throw new ActionsException("Something went wrong. Try again later");
+        } finally {
+            searcher.closeConnection();
         }
     }
 

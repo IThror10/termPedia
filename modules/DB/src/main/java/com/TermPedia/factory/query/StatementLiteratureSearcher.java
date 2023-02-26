@@ -47,6 +47,8 @@ public class StatementLiteratureSearcher implements LiteratureSearcher {
         } catch (Exception e) {
             logger.warning(e.getMessage());
             throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
         }
     }
 
@@ -71,6 +73,8 @@ public class StatementLiteratureSearcher implements LiteratureSearcher {
         } catch (Exception e) {
             logger.warning(e.getMessage());
             throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
         }
     }
 
@@ -94,6 +98,8 @@ public class StatementLiteratureSearcher implements LiteratureSearcher {
         } catch (Exception e) {
             logger.warning(e.getMessage());
             throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
         }
     }
 
@@ -119,6 +125,8 @@ public class StatementLiteratureSearcher implements LiteratureSearcher {
         } catch (Exception e) {
             logger.warning(e.getMessage());
             throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
         }
     }
 
@@ -146,8 +154,9 @@ public class StatementLiteratureSearcher implements LiteratureSearcher {
             throw e;
         } catch (Exception e) {
             logger.warning(e.getMessage());
-            throw new ActionsException(e.getMessage());
-//            throw new ActionsException("Something went wrong. Try again later.");
+            throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
         }
     }
 
@@ -173,6 +182,8 @@ public class StatementLiteratureSearcher implements LiteratureSearcher {
         } catch (Exception e) {
             logger.warning(e.getMessage());
             throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
         }
     }
 

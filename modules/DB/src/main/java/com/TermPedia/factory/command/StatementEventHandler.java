@@ -35,6 +35,8 @@ public class StatementEventHandler implements EventHandler {
             logger.warning(e.getMessage());
             throw new ActionsException(e);
 //            throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
         }
     }
 }

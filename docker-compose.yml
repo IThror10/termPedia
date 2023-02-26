@@ -1,4 +1,4 @@
-version: "3.2"
+version: "3"
 
 services:
   command-db:
@@ -8,10 +8,13 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=TermPediaCommand
+      - POSTGRES_MAX_CONNECTIONS=2000
     ports:
-      - "5050:5432"
+      - "5051:5432"
     volumes:
       - ./modules/DB/src/main/sql/commandDB/CreatePostgresDB.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - nginx-network
 
   query-db:
     image: postgres
@@ -20,10 +23,13 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=TermPediaQuery
+      - POSTGRES_MAX_CONNECTIONS=2000
     ports:
-      - "5051:5432"
+      - "5052:5432"
     volumes:
       - ./modules/DB/src/main/sql/queryDB/CreatePostgresDB.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - nginx-network
 
   backend-main:
     build:
@@ -43,14 +49,14 @@ services:
       - QUERY_PORT=5432
       - QUERY_DB=TermPediaQuery
       - MAIN_STATUS=update
+    networks:
+      - nginx-network
 
   backend-read-first:
     build:
       context: .
       dockerfile: ./config/main_app.dockerfile
     restart: on-failure
-#    ports:
-#      - "8071:8080"
     depends_on:
       - command-db
       - query-db
@@ -61,14 +67,14 @@ services:
       - QUERY_HOST=query-db
       - QUERY_PORT=5432
       - QUERY_DB=TermPediaQuery
+    networks:
+      - nginx-network
 
   backend-read-second:
     build:
       context: .
       dockerfile: ./config/main_app.dockerfile
     restart: on-failure
-#    ports:
-#      - "8072:8080"
     depends_on:
       - command-db
       - query-db
@@ -79,6 +85,8 @@ services:
       - QUERY_HOST=query-db
       - QUERY_PORT=5432
       - QUERY_DB=TermPediaQuery
+    networks:
+      - nginx-network
 
   mirror-command-db:
     image: postgres
@@ -90,7 +98,9 @@ services:
     ports:
       - "5053:5432"
     volumes:
-    - ./modules/DB/src/main/sql/commandDB/CreatePostgresDB.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./modules/DB/src/main/sql/commandDB/CreatePostgresDB.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - nginx-network
 
   mirror-query-db:
     image: postgres
@@ -103,6 +113,8 @@ services:
       - "5054:5432"
     volumes:
       - ./modules/DB/src/main/sql/queryDB/CreatePostgresDB.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - nginx-network
 
   mirror-backend-main:
     build:
@@ -122,16 +134,22 @@ services:
       - QUERY_PORT=5432
       - QUERY_DB=TermPediaQuery
       - MAIN_STATUS=update
+    networks:
+      - nginx-network
 
   pgadmin:
     image: 'dpage/pgadmin4'
     environment:
-#      - SCRIPT_NAME=/pgadmin4
       - PGADMIN_DEFAULT_EMAIL=erik.skom@yandex.ru
       - PGADMIN_DEFAULT_PASSWORD=12345
       - traefik.frontend.pgadmin4.rule=Host(`host.example.com`) && PathPrefix(`/pgadmin4`)
     ports:
-      - "6060:80"
+      - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+      - ./certs:/certs
+    networks:
+      - nginx-network
 
   nginx:
     image: 'byjg/nginx-extras:master'
@@ -146,3 +164,11 @@ services:
       - backend-read-second
       - mirror-backend-main
       - pgadmin
+    networks:
+      - nginx-network
+
+volumes:
+  pgadmin-data:
+
+networks:
+  nginx-network:

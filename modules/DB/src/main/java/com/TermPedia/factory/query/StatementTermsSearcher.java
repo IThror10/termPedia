@@ -40,6 +40,8 @@ public class StatementTermsSearcher implements TermsSearcher {
         } catch (Exception e) {
             logger.warning(e.getMessage());
             throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
         }
     }
 }

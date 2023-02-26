@@ -35,6 +35,8 @@ public class StatementAuthorsSearcher implements AuthorsSearcher {
         } catch (Exception e) {
             logger.warning(e.getMessage());
             throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
         }
     }
 }
