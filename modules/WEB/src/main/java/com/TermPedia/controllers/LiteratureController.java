@@ -314,7 +314,7 @@ public class LiteratureController {
                         tags == null ? null : Arrays.asList(tags),
                         year_start, year_end, getAmount, getAmount * (getPage - 1), bookName
                 );
-                TagLiteratureResponse response = service.searchByName(query);
+                LiteratureResponse response = service.searchByName(query);
                 return ResponseEntity.ok(response);
             }
             case 8 -> {

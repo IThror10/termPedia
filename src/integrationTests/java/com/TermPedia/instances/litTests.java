@@ -136,13 +136,12 @@ public class LitTests {
 
         //Act
         handler.handle(query);
-        TagLiteratureQueryResult result = query.getResult();
+        LiteratureQueryResult result = query.getResult();
 
         //Assert
         assertAll(
                 () -> assertEquals(1, result.getBooks().size()),
-                () -> assertEquals(lit.getYear(), result.getBooks().get(0).getYear()),
-                () -> assertEquals(0.0, result.getBooks().get(0).getRating())
+                () -> assertEquals(lit.getYear(), result.getBooks().get(0).getYear())
         );
     }
 

@@ -45,7 +45,7 @@ export default defineComponent({
   },
   data() {
     return {
-      showResults: true
+      showResults: false
     }
   },
   methods: {

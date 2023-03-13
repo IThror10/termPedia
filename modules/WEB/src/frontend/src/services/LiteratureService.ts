@@ -79,7 +79,8 @@ export class LiteratureService {
 
     public async searchByName(query: string): Promise<LiteratureArray> {
         const api = new Api();
-        return await api.get<LiteratureArray>('/api/v1/literature?' + query);
+        const response = await api.get<LiteratureArray>('/api/v1/literature?' + query);
+        return response;
     }
 
     async searchByTermName(query: string): Promise<TagLiteratureArray> {

@@ -69,11 +69,11 @@ public class LitService {
         return new LiteratureResponse(query.getResult().getBooks());
     }
 
-    public TagLiteratureResponse searchByName(FindLitByLikeNameQuery query) {
+    public LiteratureResponse searchByName(FindLitByLikeNameQuery query) {
         QueryHandler handler = new QueryHandler();
         handler.handle(query);
 
-        return new TagLiteratureResponse(query.getResult().getBooks());
+        return new LiteratureResponse(query.getResult().getBooks());
     }
 
     public RatedLiteratureResponse searchByTermId(FindLitByTermIdQuery query) {

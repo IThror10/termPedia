@@ -29,8 +29,8 @@
   import SearchComponent from "@/components/SearchComponent.vue";
   import AddTerm from "@/components/AddTerm.vue";
   import pathMixin from "@/components/mixins/pathMixin";
-  import MyList from "@/components/UI/primitives/MyList.vue";
-  import MyListItem from "@/components/UI/primitives/MyListItem.vue";
+  import MyList from "@/components/UI/list/CommonList.vue";
+  import MyListItem from "@/components/UI/list/ListItem.vue";
 
   export default defineComponent({
     name: 'TermSearchPage',
@@ -46,7 +46,7 @@
       return {
         searchWildcard: this.$route.query.term_search_name ? this.$route.query.term_search_name as string : 'object',
         curPage: this.$route.query.term_search_page ? parseInt(this.$route.query.term_search_page as string) : 1,
-        pageSize: this.$route.query.term_search_amount ? parseInt(this.$route.query.term_search_amount as string) : 4,
+        pageSize: this.$route.query.term_search_amount ? parseInt(this.$route.query.term_search_amount as string) : 6,
         terms: [],
       }
     },

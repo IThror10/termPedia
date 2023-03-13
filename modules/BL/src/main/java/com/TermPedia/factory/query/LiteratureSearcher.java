@@ -9,7 +9,7 @@ import com.TermPedia.queries.results.user.UserRatingResult;
 import com.TermPedia.queries.user.UserTermLitRatingQuery;
 
 public interface LiteratureSearcher {
-    TagLiteratureQueryResult searchByBookName(FindLitByLikeNameQuery query) throws ActionsException;
+    LiteratureQueryResult searchByBookName(FindLitByLikeNameQuery query) throws ActionsException;
     TagLiteratureQueryResult searchByTagName(FindLitByTagQuery query) throws ActionsException;
     LiteratureQueryResult searchByAuthorName(FindLitByAuthorNameQuery query) throws ActionsException;
     RatedLiteratureQueryResult searchByTermName(FindLitByLikeTermNameQuery query) throws ActionsException;

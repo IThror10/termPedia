@@ -2,7 +2,7 @@ package com.TermPedia.queries.lit;
 
 import com.TermPedia.dto.exceptions.ActionsException;
 import com.TermPedia.queries.IQuery;
-import com.TermPedia.queries.results.lit.TagLiteratureQueryResult;
+import com.TermPedia.queries.results.lit.LiteratureQueryResult;
 import com.TermPedia.queries.QueryVisitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class FindLitByLikeNameQuery implements IQuery {
-    private TagLiteratureQueryResult result;
+    private LiteratureQueryResult result;
 
     private Boolean orderByRating = true;
     private Double minRating = 0.0;

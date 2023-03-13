@@ -11,10 +11,11 @@
         v-model="searchName"
         @add="addTag"
     >
-      <tags-name-list
-          :tags="toSelect"
-          @tag-selected="choose"
-      />
+      <common-list :not-empty="toSelect.length > 0">
+        <framed-list-item v-for="(tag, index) in toSelect" :key="index" @click="choose(index)">
+          <tag-name-item :tag="tag"/>
+        </framed-list-item>
+      </common-list>
     </DropdownInput>
 
     <div v-if="hasError">
@@ -28,7 +29,11 @@
         :cur-page="curPage"
         :has-more="pageSize === data.length"
     >
-      <tag-list :tags="data" :term-id="termId"/>
+      <common-list :not-empty="data.length > 0">
+        <list-item v-for="(tag, index) in data" :key="index">
+          <tag-item :term-id="termId" :tag="tag"/>
+        </list-item>
+      </common-list>
     </search-component>
   </div>
 </template>
@@ -37,17 +42,21 @@
   import {defineComponent} from "vue";
   import SearchComponent from "@/components/SearchComponent.vue";
   import {TagData, TagName, TagService} from "@/services/TagService";
-  import router from "@/router/routes";
   import DropdownInput from "@/components/UI/composits/DropdownInput.vue";
   import pathMixin from "@/components/mixins/pathMixin";
   import errorMixin from "@/components/mixins/errorMixin";
-  import TagsNameList from "@/components/results/Tag/TagNameList.vue";
-  import TagList from "@/components/results/Tag/TagList.vue";
   import store from "@/store";
+  import CommonList from "@/components/UI/list/CommonList.vue";
+  import FramedListItem from "@/components/UI/list/FramedListItem.vue";
+  import TagItem from "@/components/results/Tag/TagItem.vue";
+  import ListItem from "@/components/UI/list/ListItem.vue";
+  import TagNameItem from "@/components/results/Tag/TagName.vue";
 
   export default defineComponent({
     name: "TagTermComponent",
-    components: {TagList, TagsNameList, DropdownInput, SearchComponent},
+    components: {
+      TagNameItem,
+      ListItem, TagItem, FramedListItem, CommonList, DropdownInput, SearchComponent},
     mixins: [pathMixin, errorMixin],
     data() : {curPage: number, pageSize: number, data: TagData[], searchName: string, toSelect: TagName[]} {
       return {
@@ -67,10 +76,10 @@
         if (newValue.length < 2)
           this.toSelect = [];
         else {
-          const query = `tag_search_name=${this.searchName}`
+          const query = `tag_search_name=${newValue}`
           let response = await this.tagS.getTagsByName(query);
-          if (!response.tags.some(tag => tag.name === this.searchName))
-              response.tags.push({name: this.searchName});
+          if (!response.tags.some(tag => tag.name === newValue))
+              response.tags.push({name: newValue});
           this.toSelect = response.tags;
         }
       }

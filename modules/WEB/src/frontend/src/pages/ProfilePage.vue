@@ -15,7 +15,7 @@
 
 <script lang="ts">
   import { defineComponent } from 'vue';
-  import UserData from "@/components/results/UserData.vue";
+  import UserData from "@/components/results/user/UserData.vue";
   import store from "@/store";
   import {UserService} from "@/services/UserService";
   import {mapActions} from "vuex";

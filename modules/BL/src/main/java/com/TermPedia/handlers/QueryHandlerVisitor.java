@@ -73,7 +73,7 @@ public class QueryHandlerVisitor implements QueryVisitor {
     @Override
     public void visitSearchBookByNameQuery(FindLitByLikeNameQuery query) throws ActionsException {
         LiteratureSearcher searcher = QueryFactory.instance().createBookSearcher();
-        TagLiteratureQueryResult result = searcher.searchByBookName(query);
+        LiteratureQueryResult result = searcher.searchByBookName(query);
         query.setResult(result);
     }
 

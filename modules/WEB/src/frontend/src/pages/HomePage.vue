@@ -25,11 +25,11 @@
           :has-more="data.length == pageSize"
           class="searcher"
       >
-        <my-list :not-empty="data.length > 0">
-          <my-list-item v-for="book in data" :key="book.lid" class="value">
+        <common-list :not-empty="data.length > 0">
+          <list-item v-for="book in data" :key="book.lid" class="value">
             <book-item :lit="book"/>
-          </my-list-item>
-        </my-list>
+          </list-item>
+        </common-list>
       </search-component>
     </common-form>
   </div>
@@ -40,16 +40,16 @@
   import LabelInput from "@/components/UI/composits/LabelInput.vue";
   import {LiteratureData, LiteratureService, RatedLiteratureData} from "@/services/LiteratureService";
   import SearchComponent from "@/components/SearchComponent.vue";
-  import MyListItem from "@/components/UI/primitives/MyListItem.vue";
-  import MyList from "@/components/UI/primitives/MyList.vue";
   import router from "@/router/routes";
   import PathMixin from "@/components/mixins/pathMixin";
   import BookItem from "@/components/results/Literature/BookItem.vue";
+  import CommonList from "@/components/UI/list/CommonList.vue";
+  import ListItem from "@/components/UI/list/ListItem.vue";
 
   export default defineComponent({
     name: "HomePage",
     mixins: [PathMixin],
-    components: {BookItem, SearchComponent, LabelInput, MyListItem, MyList},
+    components: {ListItem, CommonList, BookItem, SearchComponent, LabelInput},
     data() : {
       searchOption: string, yearStart: number, yearEnd: number, newestFirst: boolean, orderByRating: boolean,
       curPage: number, pageSize: number, data: RatedLiteratureData[] | LiteratureData[], searchName: string

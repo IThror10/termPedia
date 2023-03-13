@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts">
-  import {defineComponent, ref, watch} from "vue";
+  import {defineComponent, ref} from "vue";
   import {LiteratureData} from "@/services/LiteratureService";
   import LabelInput from "@/components/UI/composits/LabelInput.vue";
   import LabelList from "@/components/UI/composits/LabelList.vue";

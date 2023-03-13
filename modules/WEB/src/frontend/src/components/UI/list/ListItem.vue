@@ -10,7 +10,7 @@
 <script lang="ts">
   import {defineComponent} from "vue";
   export default defineComponent({
-    name: "MyListItem",
+    name: "ListItem",
     props: {
       hover: {
         type: Boolean,
@@ -23,7 +23,7 @@
 <style scoped>
   .element {
     border-bottom: 3px solid #ccc;
-    margin-top: 5px;
+    margin-top: -3px;
   }
   .hovered:hover {
     background-color: #d8d8d8;

@@ -27,21 +27,20 @@ public class StatementLiteratureSearcher implements LiteratureSearcher {
         this.searcher = searcher;
     }
     @Override
-    public TagLiteratureQueryResult searchByBookName(FindLitByLikeNameQuery settings) throws ActionsException {
+    public LiteratureQueryResult searchByBookName(FindLitByLikeNameQuery settings) throws ActionsException {
         String query = builder.bookSearchQuery(settings);
         try {
-            List<TagLiterature> books = new ArrayList<>(settings.getSearchAmount());
+            List<Literature> books = new ArrayList<>(settings.getSearchAmount());
             searcher.execute(query);
             while (searcher.next())
-                books.add(new TagLiterature(
+                books.add(new Literature(
                         searcher.getInt("lid"),
                         searcher.getString("name"),
                         searcher.getString("type"),
                         searcher.getInt("year"),
-                        jsonArrToVector(searcher.getString("authors")),
-                        searcher.getDouble("rating")
+                        jsonArrToVector(searcher.getString("authors"))
                 ));
-            return new TagLiteratureQueryResult(books);
+            return new LiteratureQueryResult(books);
         } catch (ActionsException e) {
             throw e;
         } catch (Exception e) {

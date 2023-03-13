@@ -12,7 +12,11 @@
           v-model="searchName"
           @add="addLit"
       >
-        <lit-name-list :lit="toSelect" @selected="choose"/>
+        <my-list :not-empty="toSelect.length > 0">
+          <framed-list-item v-for="(book, index) in toSelect" :key="book.id" :hover="true" @click="choose(index)">
+            <lit-name :book="book"/>
+          </framed-list-item>
+        </my-list>
       </DropdownInput>
       <div class="error" v-if="hasError">
         <error-message>{{errorMsg}}</error-message>
@@ -33,7 +37,11 @@
         :cur-page="curPage"
         :has-more="pageSize === data.length"
     >
-      <lit-list :term-id="termId" :lit="data"/>
+      <my-list :not-empty="data.length > 0">
+        <list-item v-for="book in data" :key="book.lid">
+          <lit-item :term-id="termId" :lit="book"/>
+        </list-item>
+      </my-list>
     </search-component>
   </div>
 </template>
@@ -44,14 +52,17 @@
   import {LiteratureData, LiteratureService, RatedLiteratureData} from "@/services/LiteratureService";
   import DropdownInput from "@/components/UI/composits/DropdownInput.vue";
   import pathMixin from "@/components/mixins/pathMixin";
-  import LitNameList from "@/components/results/Literature/LitNameList.vue";
   import AddLit from "@/components/AddLit.vue";
   import errorMixin from "@/components/mixins/errorMixin";
-  import LitList from "@/components/results/Literature/LitList.vue";
+  import MyList from "@/components/UI/list/CommonList.vue";
+  import LitName from "@/components/results/Literature/LitName.vue";
+  import FramedListItem from "@/components/UI/list/FramedListItem.vue";
+  import ListItem from "@/components/UI/list/ListItem.vue";
+  import LitItem from "@/components/results/Literature/LitItem.vue";
 
   export default defineComponent({
     name: "LitTermComponent",
-    components: {LitList, AddLit, LitNameList, SearchComponent, DropdownInput},
+    components: {LitItem, ListItem, FramedListItem, LitName, MyList, AddLit, SearchComponent, DropdownInput},
     mixins: [pathMixin, errorMixin],
 
     data() : {curPage: number, pageSize: number, data: RatedLiteratureData[], searchName: string,
@@ -160,5 +171,8 @@
   }
   .add-lit {
     z-index: 2;
+  }
+  .add-lit * {
+    z-index: 3;
   }
 </style>

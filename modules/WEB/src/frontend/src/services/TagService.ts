@@ -34,7 +34,6 @@ export class TagService {
 
     public async getTagsByName(query: string): Promise<TagsNameArray> {
         const api = new Api();
-        console.log(`/api/v1/tags?${query}`);
         return await api.get<TagsNameArray>(`/api/v1/tags?${query}`);
     }
 
