@@ -6,6 +6,7 @@ import com.TermPedia.commands.events.data.AddTermEvent;
 import com.TermPedia.dto.term.Term;
 import com.TermPedia.queries.lit.FindLitByTermIdQuery;
 import com.TermPedia.queries.tags.FindTagByTermIdQuery;
+import com.TermPedia.queries.terms.FindTermByIdQuery;
 import com.TermPedia.queries.terms.FindTermByNameQuery;
 import com.TermPedia.requests.term.AddLitToTermRequest;
 import com.TermPedia.requests.term.AddTagToTermRequest;
@@ -26,43 +27,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.logging.Logger;
+
 @RestController
 @RequestMapping("api/terms")
 @RequiredArgsConstructor
 public class TermController {
     private final TermService service;
-
-    @Operation(summary = "Add literature-term connection")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "202",
-                    description = "Accepted",
-                    content = @Content),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Wrong request",
-                    content = @Content),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Unauthorized",
-                    content = @Content) })
-    @SecurityRequirement(name = "Bearer Authentication")
-    @PostMapping(value = "/{termId}/litList", produces = { "application/json" }, consumes = { "application/json" })
-    public ResponseEntity addLitToTerm(
-            @RequestBody AddLitToTermRequest request,
-            @RequestAttribute("uid") Integer userId,
-            @PathVariable Integer termId
-    ) {
-        AddLitToTermEvent event = new AddLitToTermEvent(
-                termId,
-                request.litId(),
-                userId
-        );
-
-        service.addLitToTerm(event);
-        return ResponseEntity.accepted().build();
-    }
-
     @Operation(summary = "Add tag-term connection")
     @ApiResponses(value = {
             @ApiResponse(
@@ -78,7 +49,7 @@ public class TermController {
                     description = "Unauthorized",
                     content = @Content) })
     @SecurityRequirement(name = "Bearer Authentication")
-    @PostMapping(value = "/{termId}/tagsList", produces = { "application/json" }, consumes = { "application/json" })
+    @PostMapping(value = "/{termId}/tags", produces = { "application/json" }, consumes = { "application/json" })
     public ResponseEntity addTagToTerm(
             @RequestBody AddTagToTermRequest request,
             @RequestAttribute("uid") Integer userId,
@@ -109,7 +80,7 @@ public class TermController {
                     content = @Content)
     })
     @GetMapping(produces = { "application/json" })
-    public ResponseEntity getTagByTerm(
+    public ResponseEntity getTerm(
             @RequestParam(name="term_search_name") String name,
             @RequestParam(name="term_search_amount", required = false, defaultValue = "10") int getAmount,
             @RequestParam(name="term_search_page", required = false, defaultValue = "1") int getPage
@@ -171,12 +142,12 @@ public class TermController {
                     description = "Wrong request",
                     content = @Content)
     })
-    @GetMapping(value = "/{termId}/tagsList", produces = { "application/json" })
+    @GetMapping(value = "/{termId}/tags", produces = { "application/json" })
     public ResponseEntity getTagByTerm(
-            @PathParam(value = "termId") Integer termId,
-            @RequestParam(name="tag_search_amount", required = false, defaultValue = "10") int getAmount,
-            @RequestParam(name="tag_search_page", required = false, defaultValue = "1") int getPage,
-            @RequestParam(name="search_new", required = false, defaultValue = "false") boolean searchNew
+            @PathVariable Integer termId,
+            @RequestParam(name="rated_tag_search_amount", required = false, defaultValue = "10") int getAmount,
+            @RequestParam(name="rated_tag_search_page", required = false, defaultValue = "1") int getPage,
+            @RequestParam(name="search_newest_tags", required = false, defaultValue = "false") boolean searchNew
     ) {
         FindTagByTermIdQuery query = new FindTagByTermIdQuery(
                 getAmount,
@@ -189,33 +160,26 @@ public class TermController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get Lit By Term")
+    @Operation(summary = "Get Term By ID")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Found Lit",
+                    description = "Found Term",
                     content = {@Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = RatedLiteratureResponse.class))
+                            schema = @Schema(implementation = Term.class))
                     }),
             @ApiResponse(
-                    responseCode = "400",
-                    description = "Wrong request",
+                    responseCode = "404",
+                    description = "Not Found",
                     content = @Content)
     })
-    @GetMapping(value = "/{termId}/litList", produces = { "application/json" })
-    public ResponseEntity getLitByTerm(
-            @PathParam(value = "termId") Integer termId,
-            @RequestParam(name="lit_search_amount", required = false, defaultValue = "10") int getAmount,
-            @RequestParam(name="lit_search_page", required = false, defaultValue = "1") int getPage
+    @GetMapping(value = "/{termId}", produces = { "application/json" })
+    public ResponseEntity getTermById(
+            @PathVariable Integer termId
     ) {
-        FindLitByTermIdQuery query = new FindLitByTermIdQuery(
-            getAmount,
-            getAmount * (getPage - 1),
-            termId
-        );
-
-        RatedLiteratureResponse response = service.getLitByTerm(query);
+        FindTermByIdQuery query = new FindTermByIdQuery(termId);
+        Term response = service.getTerm(query);
         return ResponseEntity.ok(response);
     }
 }

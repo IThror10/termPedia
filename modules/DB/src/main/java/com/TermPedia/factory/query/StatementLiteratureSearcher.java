@@ -135,21 +135,20 @@ public class StatementLiteratureSearcher implements LiteratureSearcher {
     public UserRatingResult getUserTermLitRating(UserTermLitRatingQuery settings) throws ActionsException {
         String query = builder.userTermLitRatingQuery(settings);
         try {
+            int rating = 0;
             searcher.execute(query);
-            searcher.next();
-            int status = searcher.getInt("status");
-
-            if (status == -1)
-                throw new NotFoundException("Tag-TermId connection doesn't exist");
-            else {
-                return new UserRatingResult(
-                        new UserRating(
-                                settings.getTermId(),
-                                settings.getLitId(),
-                                searcher.getInt("rating")
-                ));
+            if (searcher.next()) {
+                if (searcher.getInt("status") == -1)
+                    throw new NotFoundException("Lit-TermId connection doesn't exist");
+                else
+                    rating = searcher.getInt("rating");
             }
-
+            return new UserRatingResult(
+                new UserRating(
+                    settings.getTermId(),
+                    settings.getLitId(),
+                    rating
+            ));
         } catch (ActionsException e) {
             throw e;
         } catch (Exception e) {

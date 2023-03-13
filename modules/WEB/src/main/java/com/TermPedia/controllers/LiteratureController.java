@@ -1,5 +1,6 @@
 package com.TermPedia.controllers;
 
+import com.TermPedia.requests.term.AddLitToTermRequest;
 import com.TermPedia.services.LitService;
 import com.TermPedia.commands.events.data.*;
 import com.TermPedia.dto.exceptions.FormatException;
@@ -54,7 +55,7 @@ public class LiteratureController {
             )
     })
     @SecurityRequirement(name = "Bearer Authentication")
-    @PostMapping(value = "/{litId}/userRatings", produces = { "application/json" }, consumes = { "application/json" })
+    @PostMapping(value = "/{litId}/userRating", produces = { "application/json" }, consumes = { "application/json" })
     public ResponseEntity rateTermLitConnection(
             @RequestBody MarkRequest request,
             @RequestAttribute("uid") Integer userId,
@@ -98,7 +99,7 @@ public class LiteratureController {
             )
     })
     @SecurityRequirement(name = "Bearer Authentication")
-    @GetMapping(value = "/{litId}/userRatings", produces = { "application/json" })
+    @GetMapping(value = "/{litId}/userRating", produces = { "application/json" })
     public ResponseEntity getTermLitRating(
             @RequestParam(name="termId") Integer termId,
             @RequestAttribute("uid") Integer userId,
@@ -211,6 +212,37 @@ public class LiteratureController {
         return ResponseEntity.accepted().build();
     }
 
+    @Operation(summary = "Add literature-term connection")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "202",
+                    description = "Accepted",
+                    content = @Content),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Wrong request",
+                    content = @Content),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized",
+                    content = @Content) })
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PostMapping(value = "/{litId}/terms", produces = { "application/json" }, consumes = { "application/json" })
+    public ResponseEntity addLitToTerm(
+            @RequestBody AddLitToTermRequest request,
+            @RequestAttribute("uid") Integer userId,
+            @PathVariable Integer litId
+    ) {
+        AddLitToTermEvent event = new AddLitToTermEvent(
+                request.termId(),
+                litId,
+                userId
+        );
+
+        service.addLitToTerm(event);
+        return ResponseEntity.accepted().build();
+    }
+
     @Operation(summary = "Search literature")
     @ApiResponses(value = {
             @ApiResponse(
@@ -227,9 +259,11 @@ public class LiteratureController {
     })
     @GetMapping(produces = { "application/json" })
     public ResponseEntity getLitByTags(
+            @RequestParam(name="term_id", required = false) Integer termId,
             @RequestParam(name="term_name", required = false) String termName,
             @RequestParam(name="author_name", required = false) String authorName,
             @RequestParam(name="book_name", required = false) String bookName,
+
             @RequestParam(name="search_amount", required = false, defaultValue = "10") int getAmount,
             @RequestParam(name="search_page", required = false, defaultValue = "1") int getPage,
 
@@ -242,7 +276,12 @@ public class LiteratureController {
             @RequestParam(name="year_start", required = false, defaultValue = "0") Integer year_start,
             @RequestParam(name="year_end", required = false, defaultValue = "2030") Integer year_end
     ) {
-        switch ((termName == null ? 0 : 1) + (authorName == null ? 0 : 2) + (bookName == null ? 0 : 4)) {
+        switch (
+                (termName == null ? 0 : 1)
+                + (authorName == null ? 0 : 2)
+                + (bookName == null ? 0 : 4)
+                + (termId == null ? 0 : 8)
+        ) {
             case 0 -> {
                 FindLitByTagQuery query = new FindLitByTagQuery(
                         null, orderByRating, minRating, litType,
@@ -278,7 +317,17 @@ public class LiteratureController {
                 TagLiteratureResponse response = service.searchByName(query);
                 return ResponseEntity.ok(response);
             }
-            default -> throw new FormatException("Unknown input parameters");
+            case 8 -> {
+                FindLitByTermIdQuery query = new FindLitByTermIdQuery(
+                        getAmount,
+                        getAmount * (getPage - 1),
+                        termId
+                );
+
+                RatedLiteratureResponse response = service.searchByTermId(query);
+                return ResponseEntity.ok(response);
+            }
+            default -> throw new FormatException("Unknown input parameters combination");
         }
     }
 }

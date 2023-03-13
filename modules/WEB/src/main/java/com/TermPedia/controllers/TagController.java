@@ -73,7 +73,7 @@ public class TagController {
             )
     })
     @SecurityRequirement(name = "Bearer Authentication")
-    @PostMapping(value = "/{tagName}/userRatings", produces = { "application/json" }, consumes = { "application/json" })
+    @PostMapping(value = "/{tagName}/userRating", produces = { "application/json" }, consumes = { "application/json" })
     public ResponseEntity rateTermTagConnection(
             @RequestBody MarkRequest request,
             @RequestAttribute("uid") Integer userId,
@@ -117,9 +117,9 @@ public class TagController {
             )
     })
     @SecurityRequirement(name = "Bearer Authentication")
-    @GetMapping(value = "/{tagName}/userRatings", produces = { "application/json" })
+    @GetMapping(value = "/{tagName}/userRating", produces = { "application/json" })
     public ResponseEntity getTermTagRating(
-            @RequestParam(name="termId") Integer termId,
+            @RequestParam(name="tid_to_tag") Integer termId,
             @RequestAttribute("uid") Integer userId,
             @PathVariable String tagName
     ) {

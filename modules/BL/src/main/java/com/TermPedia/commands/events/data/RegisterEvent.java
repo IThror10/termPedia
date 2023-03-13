@@ -17,9 +17,9 @@ public class RegisterEvent extends DataEvent {
         super(null, EventType.registration);
         if (login == null || password == null || email == null)
             throw new FormatException("Login/Password/Email not provided");
-        if (login.length() < 5)
+        if (login.length() < 4)
             throw new FormatException("Login is too short");
-        else if (password.length() < 5)
+        else if (password.length() < 8)
             throw new FormatException("Password is too short");
         else {
             this.data = new JsonBuilder(128)

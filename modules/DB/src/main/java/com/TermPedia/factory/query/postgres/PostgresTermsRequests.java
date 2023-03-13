@@ -4,6 +4,7 @@ import com.TermPedia.dto.exceptions.ActionsException;
 import com.TermPedia.factory.command.EventData;
 import com.TermPedia.factory.query.common.BaseQuerySettingsAssert;
 import com.TermPedia.factory.query.common.TermsRequests;
+import com.TermPedia.queries.terms.FindTermByIdQuery;
 import com.TermPedia.queries.terms.FindTermByNameQuery;
 
 public class PostgresTermsRequests extends BaseQuerySettingsAssert implements TermsRequests {
@@ -54,6 +55,15 @@ public class PostgresTermsRequests extends BaseQuerySettingsAssert implements Te
         builder.append("', ");
         builder.append(data.uid);
         builder.append(");");
+        return builder.toString();
+    }
+
+    @Override
+    public String getTermsByIdQuery(FindTermByIdQuery settings) {
+        builder.setLength(0);
+        builder.append("SELECT status, tid, name, description FROM data.term_by_id(");
+        builder.append(settings.getTid());
+        builder.append(")");
         return builder.toString();
     }
 }

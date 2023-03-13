@@ -100,7 +100,7 @@ public class UserTests {
     @Test
     public void registerLogoutTest() {
         String login = "thror";
-        String password = "secret";
+        String password = "secretPassword";
         String email = "babaYaga@yandex.ru";
 
         UserPrivateData data;

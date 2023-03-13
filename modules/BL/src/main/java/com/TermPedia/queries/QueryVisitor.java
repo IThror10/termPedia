@@ -3,6 +3,7 @@ package com.TermPedia.queries;
 import com.TermPedia.dto.exceptions.ActionsException;
 import com.TermPedia.queries.lit.*;
 import com.TermPedia.queries.authors.FindAuthorByNameQuery;
+import com.TermPedia.queries.terms.FindTermByIdQuery;
 import com.TermPedia.queries.user.UserTermLitRatingQuery;
 import com.TermPedia.queries.tags.FindTagByNameQuery;
 import com.TermPedia.queries.tags.FindTagByTermIdQuery;
@@ -13,6 +14,7 @@ import com.TermPedia.queries.user.UserTermTagRatingQuery;
 
 public interface QueryVisitor {
     void visitFindTermQuery(FindTermByNameQuery query) throws ActionsException;
+    void visitFindTermQuery(FindTermByIdQuery query) throws ActionsException;
     void visitFindTagByNameQuery(FindTagByNameQuery query) throws ActionsException;
     void visitFindTagByTermNameQuery(FindTagByTermIdQuery query) throws ActionsException;
     void visitFindAuthorByNameQuery(FindAuthorByNameQuery query) throws ActionsException;

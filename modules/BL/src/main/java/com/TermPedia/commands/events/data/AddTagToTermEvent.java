@@ -17,6 +17,8 @@ public class AddTagToTermEvent extends DataEvent {
         super(userId, EventType.new_term_tag);
         if (tag == null || termId == null)
             throw new FormatException("Term or Tag not provided");
+        else if (tag.length() < 2)
+            throw new FormatException("Tag name is too short");
         else {
             this.data = new JsonBuilder(128)
                     .addInt("TID", termId)

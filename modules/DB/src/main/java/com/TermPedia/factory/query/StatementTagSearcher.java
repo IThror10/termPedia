@@ -15,8 +15,6 @@ import com.TermPedia.queries.tags.FindTagByTermIdQuery;
 import com.TermPedia.queries.user.UserTermTagRatingQuery;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -77,21 +75,21 @@ public class StatementTagSearcher implements TagsSearcher {
     public UserRatingResult getUserTermTagRating(UserTermTagRatingQuery settings) throws ActionsException {
         String query = builder.userTermTagRating(settings);
         try {
+            int rating = 0;
             searcher.execute(query);
-            searcher.next();
-            int status = searcher.getInt("status");
-
-            if (status == -1)
-                throw new NotFoundException("Tag-TermId connection doesn't exist");
-            else {
-                return new UserRatingResult(
-                        new UserRating(
-                                settings.getTermId(),
-                                settings.getTag(),
-                                searcher.getInt("rating")
-                        )
-                );
+            if (searcher.next()) {
+                if (searcher.getInt("status") == -1)
+                    throw new NotFoundException("Tag-TermId connection doesn't exist");
+                else
+                    rating = searcher.getInt("rating");
             }
+            return new UserRatingResult(
+                new UserRating(
+                    settings.getTermId(),
+                    settings.getTag(),
+                    rating
+                )
+            );
         } catch (ActionsException e) {
             throw e;
         } catch (Exception e) {

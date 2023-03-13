@@ -1,6 +1,7 @@
 package com.TermPedia.handlers;
 
 import com.TermPedia.dto.exceptions.ActionsException;
+import com.TermPedia.dto.term.Term;
 import com.TermPedia.factory.command.CommandFactory;
 import com.TermPedia.factory.command.UserCommandHandler;
 import com.TermPedia.queries.QueryVisitor;
@@ -13,6 +14,7 @@ import com.TermPedia.queries.tags.FindTagByNameQuery;
 import com.TermPedia.queries.tags.FindTagByTermIdQuery;
 import com.TermPedia.queries.results.tag.RatedTagQueryResult;
 import com.TermPedia.queries.results.tag.TagQueryResult;
+import com.TermPedia.queries.terms.FindTermByIdQuery;
 import com.TermPedia.queries.terms.FindTermByNameQuery;
 import com.TermPedia.queries.results.term.TermQueryResult;
 import com.TermPedia.queries.litTypes.FindLitTypesByNameQuery;
@@ -30,6 +32,13 @@ public class QueryHandlerVisitor implements QueryVisitor {
     public void visitFindTermQuery(FindTermByNameQuery query) throws ActionsException {
         TermsSearcher searcher = QueryFactory.instance().createTermSearcher();
         TermQueryResult result = searcher.getTermsByName(query);
+        query.setResult(result);
+    }
+
+    @Override
+    public void visitFindTermQuery(FindTermByIdQuery query) throws ActionsException {
+        TermsSearcher searcher = QueryFactory.instance().createTermSearcher();
+        Term result = searcher.getTermById(query);
         query.setResult(result);
     }
 

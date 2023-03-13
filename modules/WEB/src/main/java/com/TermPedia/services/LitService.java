@@ -75,4 +75,16 @@ public class LitService {
 
         return new TagLiteratureResponse(query.getResult().getBooks());
     }
+
+    public RatedLiteratureResponse searchByTermId(FindLitByTermIdQuery query) {
+        QueryHandler handler = new QueryHandler();
+        handler.handle(query);
+
+        return new RatedLiteratureResponse(query.getResult().getBooks());
+    }
+
+    public void addLitToTerm(AddLitToTermEvent event) {
+        CommandHandler handler = new CommandHandler();
+        handler.handle(event);
+    }
 }

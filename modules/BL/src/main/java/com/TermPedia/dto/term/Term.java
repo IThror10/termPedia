@@ -21,6 +21,8 @@ public class Term {
             throw new FormatException("Term Name or Description not provided");
         else if (name.length() < 2)
             throw new FormatException("Term name is too short");
+        else if (description.length() < 8)
+            throw new FormatException("Description is too short");
         else {
             this.tid = null;
             this.name = name;

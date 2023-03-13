@@ -28,3 +28,19 @@ AS $BODY$ Begin
             tid = in_tid and lid = in_lid and uid = in_uid;
     END IF;
 END $BODY$ language plpgsql;
+
+-- Get Term By Id
+Create or Replace Function data.term_by_id(in_tid int)
+    Returns Table (
+        status int,
+        tid int,
+        name varchar,
+        description text
+    )
+AS $BODY$ Begin
+    IF (SELECT t.tid FROM data.terms t WHERE t.tid = in_tid) IS NULL THEN
+        return query SELECT -1, 0, '-'::varchar, '-'::text;
+    ELSE
+        return query SELECT 0, t.tid, t.name, t.description FROM data.terms t WHERE t.tid = in_tid;
+    END IF;
+END $BODY$ language plpgsql;

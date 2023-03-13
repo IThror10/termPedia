@@ -33,8 +33,7 @@ public class StatementEventHandler implements EventHandler {
             return new EventResult(searcher.getString("accept_event"));
         } catch (Exception e) {
             logger.warning(e.getMessage());
-            throw new ActionsException(e);
-//            throw new ActionsException("Something went wrong. Try again later.");
+            throw new ActionsException("Something went wrong. Try again later.");
         } finally {
             searcher.closeConnection();
         }
