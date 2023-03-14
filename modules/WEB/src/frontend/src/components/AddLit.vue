@@ -23,8 +23,8 @@
 
     </div>
     <div class="buttons">
-      <remove-button @click="$emit('close')">Close</remove-button>
-      <add-button @click="$emit('create', ref_form)">Create</add-button>
+      <my-button @click="$emit('close')" :classes="'remove'">Close</my-button>
+      <my-button @click="$emit('create', ref_form)" :classes="'add'">Create</my-button>
     </div>
   </div>
 </template>
@@ -34,10 +34,11 @@
   import {LiteratureData} from "@/services/LiteratureService";
   import LabelInput from "@/components/UI/composits/LabelInput.vue";
   import LabelList from "@/components/UI/composits/LabelList.vue";
+  import MyButton from "@/components/UI/primitives/MyButton.vue";
 
   export default defineComponent({
     name: "AddLit",
-    components: {LabelList, LabelInput},
+    components: {MyButton, LabelList, LabelInput},
     emits: ['close', 'create'],
     props: {
       form: {
@@ -70,5 +71,8 @@
   }
   .add-lit-form > * {
     margin: 5px 0;
+  }
+  .buttons > *{
+    margin: 0 5px;
   }
 </style>

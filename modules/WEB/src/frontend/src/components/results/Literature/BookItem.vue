@@ -2,9 +2,8 @@
   <div class="tag_info">
     <div class="value">
       <div class="data">
-        <my-label>{{lit.name}} ({{lit.year}})</my-label>
-        <my-value>Type: {{lit.type}}</my-value>
-        <my-value>Authors: {{lit.authors}}</my-value>
+        <my-label>{{lit.name}} ({{lit.year}}) // {{lit.type}}</my-label>
+        <my-value>Written by: {{lit.authors}}</my-value>
       </div>
       <div v-if="'ratesAmount' in lit">
         <my-label >

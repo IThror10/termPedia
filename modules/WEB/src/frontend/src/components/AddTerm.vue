@@ -1,13 +1,13 @@
 <template>
   <div class="add-invite" v-if="!createForm">
     <slot/>
-    <add-button @click="createForm=true">Create</add-button>
+    <my-button @click="createForm=true" :classes="'add'">Create</my-button>
   </div>
   <div class="add-form" v-else>
     <label-input label="TermName:" placeholder="Input..." v-model="addTerm.name"></label-input>
     <my-area placeholder="Description..." v-model="addTerm.description">Description</my-area>
     <div class="buttons">
-      <remove-button @click="createForm=false">Close</remove-button>
+      <my-button @click="createForm=false" :classes="'remove'">Close</my-button>
       <my-button @click="createTerm">Add</my-button>
     </div>
     <div v-if="hasError">
@@ -22,10 +22,9 @@
   import errorMixin from "@/components/mixins/errorMixin";
   import MyArea from "@/components/UI/composits/MyArea.vue";
   import MyButton from "@/components/UI/primitives/MyButton.vue";
-  import RemoveButton from "@/components/UI/primitives/RemoveButton.vue";
   export default defineComponent({
     name: "AddTerm",
-    components: {RemoveButton, MyButton, MyArea},
+    components: {MyButton, MyArea},
     mixins: [errorMixin],
     data() : {createForm: boolean, addTerm: CreateTerm} {
       return {

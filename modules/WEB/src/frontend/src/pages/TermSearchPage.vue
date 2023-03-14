@@ -2,10 +2,10 @@
   <div id="term_search_page">
     <common-form>
       <search-component
-          @search="searchTerms"
           :cur-page="curPage"
           :has-more="terms.length === pageSize"
           v-model="searchWildcard"
+          @search="searchTerms"
       >
         <my-list :not-empty="terms.length > 0">
           <my-list-item v-for="termIt in terms" :key="termIt.id" :hover="true" class="value">

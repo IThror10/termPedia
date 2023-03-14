@@ -64,7 +64,7 @@
         curPage: this.$route.query.search_page ? parseInt(this.$route.query.search_page as string) : 1,
         pageSize: this.$route.query.search_amount ? parseInt(this.$route.query.search_amount as string) : 10,
         data: [],
-        searchName: this.$route.query.lit_search_name ? this.$route.query.lit_search_name as string : 'OOP',
+        searchName: this.$route.query.search_request ? this.$route.query.search_request as string : 'OOP',
       }
     },
     computed: {
@@ -82,7 +82,8 @@
             new_first: this.newestFirst ? 'true' : 'false',
             order_by_rating: this.orderByRating ? 'true' : 'false',
             search_page: this.curPage,
-            search_amount: this.pageSize
+            search_amount: this.pageSize,
+            search_request: this.searchName
         }});
 
         switch (this.searchOption) {

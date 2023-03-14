@@ -14,7 +14,7 @@
           @blur="hideDropdown"
       />
       <div class="search-add-button" v-if="hasButton">
-        <add-button @click="$emit('add')">Add</add-button>
+        <my-button @click="$emit('add')" :classes="'add'">Add</my-button>
       </div>
     </div>
     <div v-if="showResults" class="search_result">
@@ -27,10 +27,11 @@
 import {defineComponent} from "vue";
 import InputMixin from "@/components/mixins/InputMixin";
 import MyLabel from "@/components/UI/primitives/MyLabel.vue";
+import MyButton from "@/components/UI/primitives/MyButton.vue";
 
 export default defineComponent({
   name: "DropdownInput",
-  components: {MyLabel},
+  components: {MyButton, MyLabel},
   emits: ['add'],
   mixins: [InputMixin],
   props: {

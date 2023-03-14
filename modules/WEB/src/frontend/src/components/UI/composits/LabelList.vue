@@ -5,19 +5,19 @@
       <ul>
         <li v-for="(value, index) in values" :key="index" class="removable">
           <my-value class="value">{{value}}</my-value>
-          <remove-button @click="remove(value)">Remove</remove-button>
+          <my-button @click="remove(value)" :classes="'remove'">Remove</my-button>
         </li>
         <li class="addable">
           <my-input class="input" v-model="inputValue"></my-input>
-          <add-button @click="add">Add</add-button>
+          <my-button @click="add" :classes="'add'">Add</my-button>
         </li>
       </ul>
     </div>
-    <div class="user-details-value" v-else>
+    <div class="details-value" v-else>
       <ul>
         <li>
           <my-input v-model="inputValue"></my-input>
-          <add-button @click="add">Add</add-button>
+          <my-button @click="add" :classes="'add'">Add</my-button>
         </li>
       </ul>
     </div>
@@ -26,9 +26,11 @@
 
 <script lang="ts">
   import {defineComponent} from "vue";
+  import MyButton from "@/components/UI/primitives/MyButton.vue";
 
   export default defineComponent({
     name: 'LabelList',
+    components: {MyButton},
     emits: ['add', 'remove'],
     props: {
       values: {
@@ -78,8 +80,4 @@
     flex-direction: row;
     margin-top: 10px;
   }
-
-  /*li input {*/
-  /*  width: 200px;*/
-  /*}*/
 </style>
