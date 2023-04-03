@@ -4,8 +4,8 @@
       <my-label>{{tag.name}}</my-label>
       <my-label>{{tag.rating}} 	&#11088; ({{tag.ratesAmount}} &#10032;)</my-label>
     </div>
-    <div class="rating" v-if="isAuth">
-      <my-rating @set-rating="rated" :initial-rating="rating"/>
+    <div class="rating">
+      <my-rating @set-rating="rated" :initial-rating="rating" :authorized="isAuth"/>
     </div>
   </div>
 </template>

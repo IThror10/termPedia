@@ -1,10 +1,10 @@
 <template>
-  <div class="rating">
+  <div class="rating" :title="authorized ? 'Rating' : 'Authorize'">
     <i
         v-for="star in 5"
         :key="star"
         class="star"
-        :class="{ 'filled': star <= initialRating }"
+        :class="{ 'filled': star <= initialRating && authorized, 'inactive': !authorized }"
         @click="setRating(star)"
     >&#10032;</i>
   </div>
@@ -19,8 +19,12 @@ export default defineComponent({
     initialRating: {
       type: Number,
       default: 0,
-      // validator: (value: number) => value >= 0 && value <= 5,
+      validator: (value: number) => value >= 0 && value <= 5,
     },
+    authorized: {
+      type: Boolean,
+      required: true
+    }
   },
   emits: ['setRating'],
   methods: {
@@ -32,20 +36,25 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.rating {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
+  .rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
 
-.star {
-  font-size: 2rem;
-  color: black;
-  cursor: pointer;
-}
+  .star {
+    font-size: 2rem;
+    color: black;
+    cursor: pointer;
+  }
 
-.filled {
-  color: gold;
-  font-weight: bolder;
-}
+  .filled {
+    color: gold;
+    font-weight: bolder;
+  }
+
+  .inactive {
+    color: gray;
+    font-weight: bolder;
+  }
 </style>

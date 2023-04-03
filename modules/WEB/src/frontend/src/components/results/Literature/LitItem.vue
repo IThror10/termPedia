@@ -8,8 +8,8 @@
       </div>
       <my-label>{{lit.rating}} 	&#11088; ({{lit.ratesAmount}} &#10032;)</my-label>
     </div>
-    <div class="rating" v-if="isAuth">
-      <my-rating @set-rating="rated" :initial-rating="rating"/>
+    <div class="rating">
+      <my-rating @set-rating="rated" :initial-rating="rating" :authorized="isAuth"/>
     </div>
   </div>
 </template>
