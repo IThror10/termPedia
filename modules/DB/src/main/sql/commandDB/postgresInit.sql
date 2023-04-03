@@ -3,14 +3,17 @@ CREATE SCHEMA if NOT EXISTS sync;
 
 create Table if not exists app.Users (
     UID serial UNIQUE,
-    datetime timestamp NOT NULL,
-    eventType int NOT NULL,
     login varchar(100) UNIQUE NOT NULL,
     password varchar(100) NOT NULL,
     email varchar(100) UNIQUE NOT NULL,
-    phone varchar(50)[] DEFAULT null,
-    post varchar(50)[] DEFAULT null
+    phone_post jsonb DEFAULT '{"/phone" : [], "/post" : []}',
+
+    eventType int NOT NULL,
+    datetime timestamp NOT NULL,
+    validTo timestamp DEFAULT null,
+    secret varchar(32) DEFAULT 'Init String'
 );
+ALTER SEQUENCE app.users_uid_seq RESTART WITH 300;
 
 create Table if not exists app.Events (
     UID int NOT NULL,

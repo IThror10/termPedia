@@ -9,12 +9,10 @@ plugins {
     id 'io.qameta.allure-adapter' version '2.11.1'
 }
 
-
 repositories {
     mavenCentral()
 }
 
-run.standardInput = System.in
 run.configure {
     environment "QueryFactory", queryDBMS
     environment "CommandFactory", commandDBMS
@@ -23,7 +21,6 @@ run.configure {
 application {
     mainClass = 'com.TermPedia.WebMain'
 }
-
 
 def blModule = project(':modules:BL')
 def dbModule = project(':modules:DB')
@@ -34,8 +31,6 @@ configure([blModule, dbModule, webModule]) {
     apply(plugin: 'idea')
     apply(plugin: 'io.spring.dependency-management')
     apply(plugin: 'io.qameta.allure-adapter')
-
-    sourceCompatibility = JavaVersion.VERSION_18
 
     dependencyManagement {
         imports {
@@ -58,6 +53,8 @@ configure([blModule, dbModule, webModule]) {
 
     dependencies {
         implementation 'org.jetbrains:annotations:23.0.0'
+        compileOnly 'org.projectlombok:lombok:1.18.24'
+        annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
         testImplementation 'net.bytebuddy:byte-buddy:1.12.20'
         testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -84,18 +81,18 @@ configure([dbModule, webModule]) {
 
 configure([webModule]) {
     apply(plugin: 'org.springframework.boot')
+
     dependencies {
         implementation 'org.springframework.boot:spring-boot-starter'
         implementation 'org.springframework.boot:spring-boot-starter-web'
         implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
         implementation 'org.springframework.boot:spring-boot-starter-security'
 
-//        implementation 'io.projectreactor:reactor-core'
+        implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.0'
+
         implementation "io.jsonwebtoken:jjwt-api:0.11.1"
         implementation "io.jsonwebtoken:jjwt-impl:0.11.1"
         implementation "io.jsonwebtoken:jjwt-jackson:0.11.1"
-
-        compileOnly 'org.projectlombok:lombok:1.18.24'
 
         developmentOnly 'org.springframework.boot:spring-boot-devtools'
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -116,24 +113,15 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.0'
+
     allureAggregateReport blModule
     allureAggregateReport dbModule
-//    allureAggregateReport webModule
+    allureAggregateReport webModule
     allureAggregateReport project
-
-//    test {
-//        useJUnitPlatform()
-//    }
 }
 
 tasks.create("unitTests").configure {
-    blModule.test.configure {
-        ignoreFailures = true
-    }
-
-    dbModule.test.configure {
-        ignoreFailures = true
-    }
     dependsOn(dbModule.test)
     dependsOn(blModule.test)
 }
@@ -165,7 +153,6 @@ testing {
 
                         finalizedBy(dropTestCommandDB)
                         finalizedBy(dropTestQueryDB)
-
                     }
                 }
             }
@@ -178,7 +165,7 @@ testing {
 }
 
 check.dependsOn(integrationTests)
-test.mustRunAfter(integrationTests)
+integrationTests.mustRunAfter(test)
 test.configure {
     mustRunAfter(blModule.check)
     mustRunAfter(dbModule.check)

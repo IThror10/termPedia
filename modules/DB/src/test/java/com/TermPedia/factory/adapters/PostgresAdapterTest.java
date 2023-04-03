@@ -1,6 +1,5 @@
 package com.TermPedia.factory.adapters;
 
-import com.TermPedia.factory.adapters.PostgresAdapter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
@@ -175,16 +174,16 @@ class PostgresAdapterTest {
     void getStringListTest() throws Exception {
         //Mock
         when(statement.execute(any(String.class))).thenReturn(true);
-        when(resultSet.getString(any(String.class))).thenReturn("{+7-800-555-35-35,+7-777-777-77-77}").thenReturn("{}");
+        when(resultSet.getString(any(String.class))).thenReturn("[\"+7-800-555-35-35\", \"+7-777-777-77-77\"]").thenReturn("[]");
 
         //Arrange
         PostgresAdapter adapter = new PostgresAdapter(connection);
 
         //Act
-        adapter.execute("key1 : 123.2;key2 : 245.8");
+        adapter.execute("Mock String");
 
-        List<String> res1 = adapter.getStringList("key1");
-        List<String> res2 = adapter.getStringList("key2");
+        List<String> res1 = adapter.getStringArray("Mock First");
+        List<String> res2 = adapter.getStringArray("Mock Second");
 
         //Assert
         assertAll(

@@ -32,7 +32,7 @@ public class PostgresCommandFactory extends SyncCommandFactory {
     }
 
     @Override
-    public ReqAuthHandler createReqAuthHandler() throws ActionsException {
+    public UserCommandHandler createReqAuthHandler() throws ActionsException {
         try {
             Connection connection = _establisher.establishReqAuthHandlerConnection();
             return new StatementReqAuthHandler(

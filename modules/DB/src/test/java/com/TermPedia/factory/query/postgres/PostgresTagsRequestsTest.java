@@ -1,22 +1,24 @@
 package com.TermPedia.factory.query.postgres;
 
-import com.TermPedia.events.EventType;
+import com.TermPedia.commands.events.EventType;
 import com.TermPedia.factory.command.EventData;
-import com.TermPedia.factory.query.postgres.PostgresTagsRequests;
-import com.TermPedia.queries.instances.tags.FindTagByNameQuery;
-import com.TermPedia.queries.instances.tags.FindTagByTermNameQuery;
+import com.TermPedia.queries.tags.FindTagByNameQuery;
+import com.TermPedia.queries.tags.FindTagByTermIdQuery;
+import com.TermPedia.queries.user.UserTermTagRatingQuery;
 import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class PostgresTagsRequestsTest {
 
     @Test
-    void getTagsByNameQuery() throws Exception {
+    void getTagsByNameQuery() {
         //Arrange
         PostgresTagsRequests requests = new PostgresTagsRequests();
-        FindTagByNameQuery settings = new FindTagByNameQuery("NAME", 5, 10);
-        String expected = "SELECT name FROM data.tags WHERE lower(name) = lower('NAME') or plainto_tsquery('NAME') " +
+        FindTagByNameQuery settings = new FindTagByNameQuery(5, 10, "NAME");
+        String expected = "SELECT name FROM data.tags WHERE lower(name) like lower('NAME%') or plainto_tsquery('NAME') " +
                 "@@ vector ORDER BY name LIMIT 5 OFFSET 10";
 
         //Act
@@ -26,29 +28,23 @@ class PostgresTagsRequestsTest {
         assertEquals(expected, query);
     }
     @Test
-    void getTagsByTermNameQuery() throws Exception {
+    void getTagsByTermIdQuery() {
         //Arrange
         PostgresTagsRequests requests = new PostgresTagsRequests();
 
-        FindTagByTermNameQuery recentlySettings = new FindTagByTermNameQuery
-                ("NAME", 5, 12, 12, true);
-        String recentlyExpected = "SELECT tt.tag, tt.rating, tt.rates_amount, CASE WHEN ttr.rating IS NULL THEN 0 " + "" +
-                "ELSE ttr.rating END as user_rating FROM (SELECT term, tag, rating, rates_amount FROM " +
-                "data.terms_tags where term = 'NAME') as tt LEFT JOIN data.term_tag_rates ttr on " + "" +
-                "tt.term = ttr.term and tt.tag = ttr.tag and ttr.uid = 12 ORDER BY rates_amount, tt.rating DESC " +
-                "LIMIT 5 OFFSET 12";
+        FindTagByTermIdQuery recentlySettings = new FindTagByTermIdQuery
+                (5, 12, 13,true);
+        String recentlyExpected = "SELECT tag, rating, rates_amount FROM data.terms_tags tt " +
+                "WHERE tid = 13 ORDER BY rates_amount, tt.rating DESC LIMIT 5 OFFSET 12";
 
-        FindTagByTermNameQuery bestSettings = new FindTagByTermNameQuery
-                ("NAME", 5, 12, 12, false);
-        String bestExpected = "SELECT tt.tag, tt.rating, tt.rates_amount, CASE WHEN ttr.rating IS NULL THEN 0 " + "" +
-                "ELSE ttr.rating END as user_rating FROM (SELECT term, tag, rating, rates_amount FROM " +
-                "data.terms_tags where term = 'NAME') as tt LEFT JOIN data.term_tag_rates ttr on " + "" +
-                "tt.term = ttr.term and tt.tag = ttr.tag and ttr.uid = 12 ORDER BY tt.rating DESC, rates_amount DESC " +
-                "LIMIT 5 OFFSET 12";
+        FindTagByTermIdQuery bestSettings = new FindTagByTermIdQuery
+                (5, 12, 13, false);
+        String bestExpected = "SELECT tag, rating, rates_amount FROM data.terms_tags tt " +
+                "WHERE tid = 13 ORDER BY tt.rating DESC, rates_amount DESC LIMIT 5 OFFSET 12";
 
         //Act
-        String recentlyQuery = requests.getTagsByTermNameQuery(recentlySettings);
-        String bestQuery = requests.getTagsByTermNameQuery(bestSettings);
+        String recentlyQuery = requests.getTagsByTermIdQuery(recentlySettings);
+        String bestQuery = requests.getTagsByTermIdQuery(bestSettings);
 
         //Assert
         assertEquals(recentlyExpected, recentlyQuery);
@@ -81,5 +77,19 @@ class PostgresTagsRequestsTest {
 
         //Assert
         assertEquals(expected, query);
+    }
+
+    @Test
+    void userTermTagRatingTest() {
+        //Arrange
+        UserTermTagRatingQuery settings = new UserTermTagRatingQuery(0, 1, "tagName");
+        String expect = "SELECT * FROM data.term_tag_rating(0, 1, 'tagName')";
+        PostgresTagsRequests builder = new PostgresTagsRequests();
+
+        //Act
+        String query = builder.userTermTagRating(settings);
+
+        //Assert
+        assertEquals(expect, query);
     }
 }

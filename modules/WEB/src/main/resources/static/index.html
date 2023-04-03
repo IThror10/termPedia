@@ -13,85 +13,22 @@
     </script>
 </head>
 <body>
-    <header class="root-object">
-        <span>TermPedia: Search literature for Yourself</span>
-
-    </header>
-
-    <main class="root-object">
-        <h3>Term Pedia</h3>
-
-        <form
-                onsubmit="
-    var payload = {
-        method: 'post',
-        headers: {
-            'Content-type': 'application/x-www-form-urlencoded'
-        },
-        body: `username=${this.username.value}&password=${this.password.value}`
-    };
-    fetch('/login', payload).then(resp => resp.text()).then(t => token = t);
-    return false;
-"
-        >
-            <input type="text" name="username">
-            <input type="password" name="password">
-            <input type="submit" value="Sign in">
-        </form>
-    </main>
-
-</body>
-
-    </main>
-
-    <aside class="root-object">
-        <div id="search-terms">
-            <form onclick="
-    var payload = {
-        method
-    }
-    fetch(
-    '/api/v1/term',
-    {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    }
-).then(resp => resp.json()).then(console.log)
-">
-                <div>
-                    <label>Search for terms</label>
-                </div>
-                <div>
-                    <input type="text" placeholder="Term Name" class="term-input" id="get-term-name" required></input>
-                    <input type="button" value="Search" >
-                </div>
-            </form>
-            <ul id="terms-list">
-                <li>Term 1</li>
-                <li>Term 2</li>
+    <header>
+        <h1>TermPedia</h1>
+        <nav>
+            <ul>
+                <li><a href="#">Authorization</a></li>
+                <li><a href="#">Logout</a></li>
+                <li><a href="#">Registration</a></li>
             </ul>
-        </div>
-
-        <div id="add-instance">
-            <form>
-                <div>
-                    <label>Adding Term</label>
-                </div>
-                <div>
-                    <input type="text" placeholder="Term Name" class="term-input" id="add-term-name" required></input>
-                </div>
-                <div>
-                    <textarea placeholder="Term decsription" class="term-input" id="add-term-description" required></textarea>
-                </div>
-                <div>
-                    <input type="button" value="Add Term" >
-                    <input type="reset" value="Clear input">
-                </div>
-            </form>
-        </div>
-    </aside>
-
-    <script src="js/main.js"></script>
+        </nav>
+    </header>
+    <div>
+        <h1>Однажды здесь будет Front</h1>
+        <img src="./img/intro.jpg" width="50%" height="auto">
+    </div>
+    <footer>
+        <p>&copy; 2023 TermPedia. All rights reserved.</p>
+    </footer>
+<script src="script.js"></script>
 </body>
-</html>

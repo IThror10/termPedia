@@ -1,14 +1,14 @@
 package com.TermPedia.factory.command;
 
 import com.TermPedia.dto.exceptions.ActionsException;
-import com.TermPedia.factory.BaseProvider;
+import com.TermPedia.factory.provider.BaseProvider;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Hashtable;
 
 public abstract class CommandFactory {
     public abstract EventHandler createEventHandler() throws ActionsException;
-    public abstract ReqAuthHandler createReqAuthHandler() throws ActionsException;
+    public abstract UserCommandHandler createReqAuthHandler() throws ActionsException;
     private static CommandFactory factory = null;
     public static CommandFactory instance() throws NullPointerException {
         if (factory == null) {

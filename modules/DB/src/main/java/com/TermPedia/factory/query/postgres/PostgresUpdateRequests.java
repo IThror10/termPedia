@@ -33,4 +33,7 @@ public class PostgresUpdateRequests implements UpdateRequests {
     public String newRateTermTagQuery(EventData data) {
         return new PostgresTagsRequests().rateTagTermQuery(data);
     }
+
+    @Override
+    public String newLitQuery(EventData data) { return new PostgresLiteratureRequests().addLiterature(data); }
 }

@@ -1,6 +1,6 @@
 package com.TermPedia.factory.command.postgres;
 
-import com.TermPedia.events.BaseEvent;
+import com.TermPedia.commands.events.DataEvent;
 import com.TermPedia.factory.command.common.IEventHandlerRequests;
 
 public class PostgresEventHandlerRequests implements IEventHandlerRequests {
@@ -10,12 +10,12 @@ public class PostgresEventHandlerRequests implements IEventHandlerRequests {
     }
 
     @Override
-    public String acceptEventQuery(BaseEvent event) {
+    public String acceptEventQuery(DataEvent event) {
         builder.setLength(0);
         builder.append("SELECT * FROM app.accept_event(");
-        builder.append(event.uid);
+        builder.append(event.getUid());
         builder.append(", '");
-        builder.append(event.dateTime);
+        builder.append(event.getDateTime());
         builder.append("', ");
         builder.append(event.getEventType().ordinal());
         builder.append(", '");

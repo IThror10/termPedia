@@ -1,6 +1,5 @@
 package com.TermPedia.factory.command.postgres;
 
-import com.TermPedia.factory.command.postgres.PostgresSyncRequests;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

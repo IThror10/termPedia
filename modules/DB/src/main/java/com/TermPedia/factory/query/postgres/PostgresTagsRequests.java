@@ -2,26 +2,27 @@ package com.TermPedia.factory.query.postgres;
 
 import com.TermPedia.dto.exceptions.ActionsException;
 import com.TermPedia.factory.command.EventData;
-import com.TermPedia.factory.query.common.AssertByNameGetSettings;
+import com.TermPedia.factory.query.common.BaseQuerySettingsAssert;
 import com.TermPedia.factory.query.common.TagsRequests;
-import com.TermPedia.queries.instances.IByNameGetSettings;
-import com.TermPedia.queries.instances.IRatedGetSettings;
+import com.TermPedia.queries.tags.FindTagByNameQuery;
+import com.TermPedia.queries.tags.FindTagByTermIdQuery;
+import com.TermPedia.queries.user.UserTermTagRatingQuery;
 
 
-public class PostgresTagsRequests extends AssertByNameGetSettings implements TagsRequests {
+public class PostgresTagsRequests extends BaseQuerySettingsAssert implements TagsRequests {
     private final StringBuilder builder;
     public PostgresTagsRequests() {
         builder = new StringBuilder(128);
     }
 
     @Override
-    public String getTagsByNameQuery(IByNameGetSettings settings) throws ActionsException {
-        assertCorrect(settings);
+    public String getTagsByNameQuery(FindTagByNameQuery settings) throws ActionsException {
+        assertSelectCorrect(settings.getSearchAmount(), settings.getSkipAmount());
 
         builder.setLength(0);
-        builder.append("SELECT name FROM data.tags WHERE lower(name) = lower('");
+        builder.append("SELECT name FROM data.tags WHERE lower(name) like lower('");
         builder.append(settings.getName());
-        builder.append("') or plainto_tsquery('");
+        builder.append("%') or plainto_tsquery('");
         builder.append(settings.getName());
         builder.append("') @@ vector ORDER BY name LIMIT ");
         builder.append(settings.getSearchAmount());
@@ -31,16 +32,15 @@ public class PostgresTagsRequests extends AssertByNameGetSettings implements Tag
     }
 
     @Override
-    public String getTagsByTermNameQuery(IRatedGetSettings settings) throws ActionsException {
-        assertCorrect(settings);
+    public String getTagsByTermIdQuery(FindTagByTermIdQuery settings) throws ActionsException {
+        assertSelectCorrect(settings.getSearchAmount(), settings.getSearchAmount());
+
 
         builder.setLength(0);
-        builder.append("SELECT tt.tag, tt.rating, tt.rates_amount, CASE WHEN ttr.rating IS NULL THEN 0 ELSE ttr.rating" +
-                " END as user_rating FROM (SELECT term, tag, rating, rates_amount FROM data.terms_tags where term = '");
-        builder.append(settings.getName());
-        builder.append("') as tt LEFT JOIN data.term_tag_rates ttr on tt.term = ttr.term and tt.tag = ttr.tag and ttr.uid = ");
-        builder.append(settings.getUid());
-        if (settings.searchNew())
+        builder.append("SELECT tag, rating, rates_amount FROM data.terms_tags tt WHERE tid = ");
+        builder.append(settings.getTermId());
+
+        if (settings.isSearchNew())
             builder.append(" ORDER BY rates_amount, tt.rating DESC ");
         else
             builder.append(" ORDER BY tt.rating DESC, rates_amount DESC ");
@@ -50,6 +50,20 @@ public class PostgresTagsRequests extends AssertByNameGetSettings implements Tag
         builder.append(settings.getSkipAmount());
         return builder.toString();
     }
+
+    @Override
+    public String userTermTagRating(UserTermTagRatingQuery settings) throws ActionsException {
+        builder.setLength(0);
+        builder.append("SELECT * FROM data.term_tag_rating(");
+        builder.append(settings.getUserId());
+        builder.append(", ");
+        builder.append(settings.getTermId());
+        builder.append(", '");
+        builder.append(settings.getTag());
+        builder.append("')");
+        return builder.toString();
+    }
+
     @Override
     public String addTagToTermQuery(EventData data) {
         builder.setLength(0);

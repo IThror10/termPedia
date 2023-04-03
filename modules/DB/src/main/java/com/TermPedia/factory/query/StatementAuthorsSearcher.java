@@ -3,11 +3,12 @@ package com.TermPedia.factory.query;
 import com.TermPedia.dto.exceptions.ActionsException;
 import com.TermPedia.factory.adapters.ISearchAdapter;
 import com.TermPedia.factory.query.common.AuthorsRequests;
-import com.TermPedia.queries.instances.IByNameGetSettings;
-import com.TermPedia.queries.instances.authors.AuthorQueryResult;
+import com.TermPedia.queries.authors.FindAuthorByNameQuery;
+import com.TermPedia.queries.results.author.AuthorQueryResult;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class StatementAuthorsSearcher implements AuthorsSearcher {
@@ -21,19 +22,21 @@ public class StatementAuthorsSearcher implements AuthorsSearcher {
         this.searcher = searcher;
     }
     @Override
-    public AuthorQueryResult getAuthorByName(IByNameGetSettings settings) throws ActionsException {
+    public AuthorQueryResult getAuthorByName(FindAuthorByNameQuery settings) throws ActionsException {
+        String query = builder.getAuthorsByNameQuery(settings);
         try {
-            String query = builder.getAuthorsByNameQuery(settings);
-            Vector<String> authors = new Vector<>(settings.getSearchAmount());
-            if (searcher.execute(query))
-                while (searcher.next())
-                    authors.add(searcher.getString("name"));
+            List<String> authors = new ArrayList<>(settings.getSearchAmount());
+            searcher.execute(query);
+            while (searcher.next())
+                authors.add(searcher.getString("name"));
             return new AuthorQueryResult(authors);
         } catch (ActionsException e) {
             throw e;
         } catch (Exception e) {
             logger.warning(e.getMessage());
             throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
         }
     }
 }

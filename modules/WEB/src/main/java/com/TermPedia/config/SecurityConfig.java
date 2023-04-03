@@ -1,8 +1,10 @@
 package com.TermPedia.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -11,41 +13,31 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig{
-//    private final AuthenticationProvider authProvider;
     private final JwtAuthFilter filter;
-
-    public SecurityConfig(/*AuthenticationProvider authProvider, */JwtAuthFilter filter) {
-//        this.authProvider = authProvider;
-        this.filter = filter;
-    }
 
     @Bean
     public SecurityFilterChain securityWebFilterChain(HttpSecurity http) throws Exception {
         return http
-//                .exceptionHandling()
-//                .authenticationEntryPoint(controller)
-//                .accessDeniedHandler(handler)
-//                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint((req, res, authExp) -> res.setStatus(HttpStatus.UNAUTHORIZED.value()))
+                .accessDeniedHandler((req, res, authExp) -> res.setStatus(HttpStatus.FORBIDDEN.value()))
+                .and()
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers("/api/v1/user/login").permitAll()
-                                .requestMatchers("/api/v1/user/register").permitAll()
-                                .requestMatchers("/greeting").authenticated()
-//                                .requestMatchers("/api/v1/term").authenticated()
-                                .anyRequest().permitAll()
-//                        .requestMatchers("/").permitAll()
-//                        .anyRequest().authenticated()
-//                        .requestMatchers(HttpMethod.POST, "/api/v1/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/**").authenticated()
+                        .requestMatchers(HttpMethod.PATCH, "/api/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/tags/*/userRating").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/literature/*/userRating").authenticated()
+                        .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .httpBasic(Customizer.withDefaults())
-//                .authenticationProvider(authProvider)
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
-//                .formLogin().disable()
-//                .httpBasic().disable()
-//                .httpBasic(Customizer.withDefaults())
+                .httpBasic(Customizer.withDefaults())
                 .build();
     }
 

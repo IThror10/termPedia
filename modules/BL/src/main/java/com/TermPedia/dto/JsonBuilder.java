@@ -1,9 +1,11 @@
 package com.TermPedia.dto;
 
-import com.TermPedia.dto.exceptions.ActionsException;
+import com.TermPedia.dto.literature.Literature;
+import com.TermPedia.dto.exceptions.FormatException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import java.util.Vector;
+
+import java.util.List;
 
 public class JsonBuilder implements DatumBuilder {
     private final StringBuilder builder;
@@ -21,19 +23,22 @@ public class JsonBuilder implements DatumBuilder {
         builder.append("{}");
     }
 
+    @Override
     public String getData() {
         return builder.toString();
     }
 
 
-    public DatumBuilder addInt(@NotNull String key, int value) {
+    @Override
+    public DatumBuilder addInt(@NotNull String key, @Nullable Integer value) throws FormatException {
         changeBegin();
         appendStringInt(key, value);
         changeCommit();
         return this;
     }
 
-    public DatumBuilder addStr(@NotNull String key, @Nullable String value) throws ActionsException {
+    @Override
+    public DatumBuilder addStr(@NotNull String key, @Nullable String value) throws FormatException {
         checkStringValue(value);
         changeBegin();
         appendStringString(key, value);
@@ -41,36 +46,37 @@ public class JsonBuilder implements DatumBuilder {
         return this;
     }
 
-    public DatumBuilder addBook(@NotNull Book book) throws ActionsException {
-        checkStringValue(book.name);
-        checkStringValue(book.type);
-        checkStringArrValues(book.authors);
+    @Override
+    public DatumBuilder addLiterature(@NotNull Literature lit) throws FormatException {
+        checkStringValue(lit.getName());
+        checkStringValue(lit.getType());
+        checkStringList(lit.getAuthors());
 
         changeBegin();
-        appendBook(book);
+        appendBook(lit);
         changeCommit();
         return this;
     }
 
-    private void appendBook(@NotNull Book book) {
+    private void appendBook(@NotNull Literature lit) {
         builder.append("\"Book\" : ");
         builder.append("{");
-        appendStringString("Name", book.name);
+        appendStringString("Name", lit.getName());
         builder.append(", ");
-        appendStringString("Type", book.type);
+        appendStringString("Type", lit.getType());
         builder.append(", ");
-        appendStringInt("Year", book.year);
+        appendStringInt("Year", lit.getYear());
         builder.append(", ");
-        appendStringArrString("Authors", book.authors);
+        appendAuthorsList(lit.getAuthors());
         builder.append("}");
     }
 
 
-    private void appendStringInt(@NotNull String str, int num) {
+    private void appendStringInt(@NotNull String str, @Nullable Integer num) {
         builder.append("\"");
         builder.append(str);
         builder.append("\" : ");
-        builder.append(num);
+        builder.append(num == null ? "null" : num);
     }
 
     private void appendStringString(@NotNull String str1, @Nullable String str2) {
@@ -85,13 +91,11 @@ public class JsonBuilder implements DatumBuilder {
         }
     }
 
-    private void appendStringArrString(@NotNull String str1, Vector<String> arr) {
-        builder.append("\"");
-        builder.append(str1);
-        builder.append("\" : [");
-
+    private void appendAuthorsList(@Nullable List<String> values) {
         boolean isFirst = true;
-        for (String value: arr) {
+
+        builder.append("\"Authors\" : [");
+        if (values != null) for (String value: values) {
             if (isFirst)
                 isFirst = false;
             else
@@ -119,14 +123,14 @@ public class JsonBuilder implements DatumBuilder {
         builder.append("}");
     }
 
-    private void checkStringArrValues(Vector<String> arr) throws ActionsException {
-        for (String str : arr)
+    private void checkStringList(@Nullable List<String> values) throws FormatException {
+        if (values != null) for (String str : values)
             checkStringValue(str);
     }
-    private void checkStringValue(@NotNull String str) throws ActionsException {
+    private void checkStringValue(@Nullable String str) throws FormatException {
         if (str == null)
             return;
-        if (str.contains("\\") || str.contains("\""))
-            throw new ActionsException("String contains forbidden symbol '\\' or '\"'");
+        if (str.contains("\\") || str.contains("\"") || str.contains("/") || str.contains("?") || str.contains("'"))
+            throw new FormatException("String contains forbidden symbol [`\\`, `\"`, `'`,`?`, `/`]");
     }
 }

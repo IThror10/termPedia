@@ -1,60 +1,164 @@
 package com.TermPedia.controllers;
 
-
-import com.TermPedia.securityDTO.AuthenticationResponse;
-import com.TermPedia.securityDTO.LoginRequest;
-import com.TermPedia.securityDTO.RegisterRequest;
+import com.TermPedia.commands.events.data.RegisterEvent;
+import com.TermPedia.commands.user.AuthorizeCommand;
+import com.TermPedia.commands.user.ChangeContactsCommand;
+import com.TermPedia.commands.user.LogoutCommand;
+import com.TermPedia.handlers.QueryHandler;
+import com.TermPedia.queries.user.GetUserPublicDataQuery;
+import com.TermPedia.requests.user.AuthorizeRequest;
+import com.TermPedia.requests.user.DataChangeRequest;
+import com.TermPedia.requests.user.RegisterRequest;
+import com.TermPedia.responses.item.EventResponse;
+import com.TermPedia.responses.user.AuthenticationResponse;
+import com.TermPedia.responses.user.UserPublicDataResponse;
 import com.TermPedia.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import java.net.URI;
+
 
 @RestController
-@RequestMapping("api/v1/user")
+@RequiredArgsConstructor
+@RequestMapping("api/users")
 public class UserController {
-//    private final static ResponseEntity<Object> UNAUTHORIZED =
-//            ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-
     private final UserService userService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
+    @Operation(summary = "Create new user")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "User created",
+                    content = {@Content(
+                            mediaType = "application/json",
+                            schema = @Schema)
+                    }),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Wrong request body",
+                    content = @Content),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Login/Email already used",
+                    content = @Content) })
+    @PostMapping(produces = { "application/json" }, consumes = { "application/json" })
+    public ResponseEntity register(@RequestBody RegisterRequest request) throws Exception {
+        RegisterEvent event = new RegisterEvent(
+                request.login(),
+                request.password(),
+                request.email()
+        );
+
+        EventResponse response = userService.register(event);
+        return ResponseEntity.created(new URI("user/" + response.login)).build();
     }
 
-    //    public ResponseEntity login(ServerWebExchange swe) {
-//        return ResponseEntity.ok(swe.getRequest().toString());
-//        Mono<MultiValueMap<String, String>> formData = swe.getFormData();
-//        formData.flatMap(credentials ->
-//
-//        );
-//        return swe.getFormData().flatMap(credentials -> {
-//            User user = userService.authorize(credentials.getFirst("username"), credentials.getFirst("password"));
-//            if (user != null)
-//                return ResponseEntity.ok(jwtUtil.generateToken(user));
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-//        })
-//        }).defaultIfEmpty());
-//    }
-    @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(@RequestBody Map<String, String> message) {
-        LoginRequest request = new LoginRequest(
-                message.get("login"),
-                message.get("password")
+    @Operation(summary = "Change User's public data")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Data Changed",
+                    content = {@Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserPublicDataResponse.class))
+                    }),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Wrong request body",
+                    content = @Content),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized",
+                    content = @Content)})
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PatchMapping(produces = { "application/json" }, consumes = { "application/json" })
+    public ResponseEntity changeData(@RequestBody DataChangeRequest request, @RequestAttribute("uid") Integer userId) {
+        ChangeContactsCommand command = new ChangeContactsCommand(
+                userId,
+                request.field(),
+                request.op(),
+                request.getValue()
         );
-        return ResponseEntity.ok(userService.login(request));
+
+        UserPublicDataResponse data = userService.changePublicData(command);
+        return ResponseEntity.ok(data);
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register (@RequestBody Map<String, String> message) {
-        RegisterRequest request = new RegisterRequest(
-                message.get("login"),
-                message.get("password"),
-                message.get("email")
+    @Operation(summary = "Logs user into system")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "User logged in",
+                    content = {@Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = AuthenticationResponse.class))
+                    }),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Wrong request body",
+                    content = @Content),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Wrong Login/Password",
+                    content = @Content) })
+    @PostMapping(value = "/login", produces = { "application/json" }, consumes = { "application/json" })
+    public ResponseEntity login(@RequestBody AuthorizeRequest request) {
+        AuthorizeCommand command = new AuthorizeCommand(
+                request.login(),
+                request.password()
         );
-        return ResponseEntity.ok(userService.register(request));
+
+        AuthenticationResponse response = userService.login(command);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Closes User session")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "User logged out",
+                    content = @Content),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized",
+                    content = @Content)})
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PostMapping("/logout")
+    public ResponseEntity logout(@RequestAttribute("uid") Integer userId) {
+        LogoutCommand command = new LogoutCommand(userId);
+
+        userService.logout(command);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Get Contact Information of User")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "User contact Data",
+                    content = {@Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserPublicDataResponse.class))
+                    }),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content
+            )
+    })
+    @GetMapping(value = "/{userLogin}", produces = { "application/json" })
+    public ResponseEntity getUser(@PathVariable String userLogin) {
+        GetUserPublicDataQuery query = new GetUserPublicDataQuery(userLogin);
+
+        UserPublicDataResponse response = userService.getUserPublicData(query);
+        return ResponseEntity.ok(response);
     }
 }

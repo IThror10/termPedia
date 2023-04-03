@@ -1,11 +1,13 @@
 package com.TermPedia.factory.query;
 
 import com.TermPedia.dto.exceptions.ActionsException;
-import com.TermPedia.dto.Term;
+import com.TermPedia.dto.exceptions.NotFoundException;
+import com.TermPedia.dto.term.Term;
 import com.TermPedia.factory.adapters.ISearchAdapter;
 import com.TermPedia.factory.query.common.TermsRequests;
-import com.TermPedia.queries.instances.IByNameGetSettings;
-import com.TermPedia.queries.instances.terms.TermQueryResult;
+import com.TermPedia.queries.results.term.TermQueryResult;
+import com.TermPedia.queries.terms.FindTermByIdQuery;
+import com.TermPedia.queries.terms.FindTermByNameQuery;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Vector;
@@ -23,37 +25,48 @@ public class StatementTermsSearcher implements TermsSearcher {
     }
 
     @Override
-    public TermQueryResult getTermsByName(IByNameGetSettings settings) throws ActionsException {
+    public TermQueryResult getTermsByName(FindTermByNameQuery settings) throws ActionsException {
+        String query = builder.getTermsByNameQuery(settings);
         try {
-            String query = builder.getTermsByNameQuery(settings);
             Vector<Term> terms = new Vector<>(settings.getSearchAmount());
-            if (searcher.execute(query))
-                while (searcher.next())
-                    terms.add(new Term(
-                            searcher.getString("name"),
-                            searcher.getString("description")
-                    ));
+            searcher.execute(query);
+            while (searcher.next())
+                terms.add(new Term(
+                        searcher.getInt("tid"),
+                        searcher.getString("name"),
+                        searcher.getString("description")
+                ));
             return new TermQueryResult(terms);
         } catch (ActionsException e) {
             throw e;
         } catch (Exception e) {
             logger.warning(e.getMessage());
             throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
         }
     }
 
     @Override
-    public boolean termExists(Term term) throws ActionsException {
+    public Term getTermById(FindTermByIdQuery settings) throws ActionsException {
+        String query = builder.getTermsByIdQuery(settings);
         try {
-            String query = builder.termsExists(term);
-            if (searcher.execute(query)) {
-                searcher.next();
-                return searcher.getBoolean("exists");
-            }
-            return false;
+            searcher.execute(query);
+            searcher.next();
+            if (searcher.getInt("status") == -1)
+                throw new NotFoundException("Term Not Found");
+            return new Term(
+                searcher.getInt("tid"),
+                searcher.getString("name"),
+                searcher.getString("description")
+            );
+        } catch (ActionsException e) {
+            throw e;
         } catch (Exception e) {
             logger.warning(e.getMessage());
             throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
         }
     }
 }

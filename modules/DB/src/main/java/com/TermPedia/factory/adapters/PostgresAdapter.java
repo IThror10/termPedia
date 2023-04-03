@@ -4,13 +4,13 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class PostgresAdapter implements ISyncAdapter, ISearchAdapter{
     protected final Connection connection;
     protected ResultSet resultSet;
-    private boolean updatable;
+    private final boolean updatable;
 
     public PostgresAdapter(Connection connection) {
         this.connection = connection;
@@ -62,16 +62,30 @@ public class PostgresAdapter implements ISyncAdapter, ISearchAdapter{
     }
 
     @Override
-    public List<String> getStringList(String key) throws Exception {
+    public List<String> getStringArray(String key) throws Exception {
         String source = resultSet.getString(key);
         List<String> list = new ArrayList<>();
 
-        if (source == null || source.length() < 3)
+        if (source == null)
             return list;
 
-        for (String res: source.substring(1, source.length() - 1).split(","))
-            list.add(res);
+        int i = 0, j = 0;
+        while (i >= 0 && j >= 0) {
+            i = source.indexOf("\"", j + 1);
+            j = source.indexOf("\"", i + 1);
+            if (i > 0 && j > 0)
+                list.add(source.substring(i + 1, j));
+        }
         return list;
+    }
+
+    @Override
+    public void closeConnection() {
+        try {
+            connection.close();
+        } catch (Exception e) {
+            Logger.getLogger("Postgres Adapter").warning(e.getMessage());
+        }
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.TermPedia.factory.command;
 
-import com.TermPedia.events.EventType;
+import com.TermPedia.commands.events.EventType;
 import org.jetbrains.annotations.NotNull;
 
 public class EventData {

@@ -1,6 +1,6 @@
 package com.TermPedia.factory;
 
-import com.TermPedia.factory.ConstProvider;
+import com.TermPedia.factory.provider.ConstProvider;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

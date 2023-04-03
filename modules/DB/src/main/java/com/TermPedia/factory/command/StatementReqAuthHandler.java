@@ -1,25 +1,21 @@
 package com.TermPedia.factory.command;
 
-import com.TermPedia.dto.exceptions.ActionsException;
-import com.TermPedia.dto.exceptions.DataConflictException;
-import com.TermPedia.dto.exceptions.NotFoundException;
-import com.TermPedia.dto.users.UserPublicData;
-import com.TermPedia.events.result.AuthEventResult;
-import com.TermPedia.events.result.EventStatus;
 import com.TermPedia.factory.adapters.ISearchAdapter;
 import com.TermPedia.factory.command.common.IReqAuthHandlerRequests;
-import com.TermPedia.events.user.AuthorizeEvent;
-import com.TermPedia.events.user.RegisterEvent;
-import com.TermPedia.dto.users.User;
-import com.TermPedia.queries.instances.users.GetUserPublicDataQuery;
-import com.TermPedia.queries.instances.users.UserPublicDataQueryResult;
-import org.jetbrains.annotations.NotNull;
+import com.TermPedia.dto.exceptions.*;
+import com.TermPedia.dto.users.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import com.TermPedia.commands.events.data.RegisterEvent;
+import com.TermPedia.commands.result.*;
+import com.TermPedia.commands.user.*;
+
+import com.TermPedia.queries.user.GetUserPublicDataQuery;
+import com.TermPedia.queries.results.user.UserPublicDataQueryResult;
+
+import org.jetbrains.annotations.NotNull;
 import java.util.logging.Logger;
 
-public class StatementReqAuthHandler implements ReqAuthHandler {
+public class StatementReqAuthHandler implements UserCommandHandler {
     private final ISearchAdapter searcher;
     private final IReqAuthHandlerRequests builder;
     private final static Logger logger;
@@ -29,50 +25,109 @@ public class StatementReqAuthHandler implements ReqAuthHandler {
         this.builder = builder;
     }
 
-
     @Override
-    public AuthEventResult authorize(@NotNull AuthorizeEvent event) throws ActionsException {
-        String query = builder.authorizeEventQuery(event);
+    public EventResult register(@NotNull RegisterEvent event) throws ActionsException {
+        String query = builder.registerEventQuery(event);
         try {
-            UserPublicData data = null;
-            if (searcher.execute(query) && searcher.next())
-                data = getUserPublicData();
-            if (data == null || data.userID() == -1)
-                throw new ActionsException("Wrong Login/Password" + event.getData());
-            return new AuthEventResult(data);
+            searcher.execute(query);
+            searcher.next();
+            return switch (searcher.getInt("status")) {
+                case -1 -> throw new DataConflictException("This Login is Already Used");
+                case -2 -> throw new DataConflictException("This Email is Already Used");
+                case -3 -> throw new FormatException("Wrong Email address format");
+                default -> new EventResult(searcher.getString("login"));
+            };
         } catch (ActionsException e) {
             throw e;
         } catch (Exception e) {
             logger.warning(e.getMessage());
             throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
         }
     }
 
     @Override
-    public AuthEventResult register(@NotNull RegisterEvent event) throws ActionsException {
-        String query = builder.registerEventQuery(event);
+    public AuthCommandResult authorize(@NotNull AuthorizeCommand event) throws ActionsException {
+        String query = builder.authorizeEventQuery(event);
         try {
-            if (searcher.execute(query)) {
-                searcher.next();
-                Integer userId = searcher.getInt("uid");
-                switch (userId) {
-                    case -1:
-                        throw new ActionsException("This Login is Already Used");
+            searcher.execute(query);
+            searcher.next();
 
-                    case -2:
-                        throw new ActionsException("This Email is Already Used");
+            if (searcher.getInt("status") == -1)
+                throw new NotFoundException("Wrong email/password");
 
-                    case -3:
-                        throw new ActionsException("Wrong Email address");
-                }
-                return new AuthEventResult(getUserPublicData());
-            }
-            throw new DataConflictException("Email already used");
+            return new AuthCommandResult(getUserPrivateData());
         } catch (ActionsException e) {
             throw e;
         } catch (Exception e) {
             logger.warning(e.getMessage());
             throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
+        }
+    }
+
+    @Override
+    public ValidateCommandResult validate(@NotNull ValidateCommand event) throws ActionsException {
+        String query = builder.validEventQuery(event);
+        try {
+            searcher.execute(query);
+            searcher.next();
+
+            if (searcher.getInt("status") == -1)
+                return new ValidateCommandResult(new UserValidData(null, null));
+
+            return new ValidateCommandResult(new UserValidData(
+                searcher.getInt("uid"),
+                searcher.getString("login")
+            ));
+        } catch (ActionsException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.warning(e.getMessage());
+            throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
+        }
+    }
+
+    @Override
+    public EventResult logout(@NotNull LogoutCommand event) throws ActionsException {
+        String query = builder.logoutEventQuery(event);
+        try {
+            searcher.execute(query);
+            searcher.next();
+            return new EventResult(searcher.getString("login"));
+        } catch (ActionsException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.warning(e.getMessage());
+            throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
+        }
+    }
+
+    @Override
+    public ContactDataEventResult changeContactData(@NotNull ChangeContactsCommand event) throws ActionsException {
+        String query = builder.changeContactDataQuery(event);
+        try {
+            searcher.execute(query);
+            searcher.next();
+            int status = searcher.getInt("status");
+            return switch (status) {
+                case -1 -> throw new NotFoundException("Change target not found");
+                case -2 -> throw new NotFoundException("Operation not found");
+                default -> new ContactDataEventResult(getUserPublicData());
+            };
+        } catch (ActionsException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.warning(e.getMessage());
+            throw new ActionsException("Something went wrong. Try again later.");
+        } finally {
+            searcher.closeConnection();
         }
     }
 
@@ -89,18 +144,26 @@ public class StatementReqAuthHandler implements ReqAuthHandler {
         } catch (Exception e) {
             logger.warning(e.getMessage());
             throw new ActionsException("Something went wrong. Try again later");
+        } finally {
+            searcher.closeConnection();
         }
     }
 
-    private UserPublicData getUserPublicData() throws Exception {
-        String[] roles = {"USER"};
-        return new UserPublicData(
-                searcher.getInt("uid"),
+    private UserPrivateData getUserPrivateData() throws Exception {
+        return new UserPrivateData(
+                searcher.getString("secret"),
                 searcher.getString("login"),
                 searcher.getString("email"),
-                searcher.getStringList("phone"),
-                searcher.getStringList("post"),
-                new ArrayList<>(Arrays.stream(roles).toList())
+                searcher.getStringArray("phone"),
+                searcher.getStringArray("post")
+        );
+    }
+    private UserPublicData getUserPublicData() throws Exception {
+        return new UserPublicData(
+                searcher.getString("login"),
+                searcher.getString("email"),
+                searcher.getStringArray("phone"),
+                searcher.getStringArray("post")
         );
     }
 }

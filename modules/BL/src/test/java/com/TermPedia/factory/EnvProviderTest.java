@@ -1,7 +1,7 @@
 package com.TermPedia.factory;
 
-import com.TermPedia.factory.BaseProvider;
-import com.TermPedia.factory.EnvProvider;
+import com.TermPedia.factory.provider.BaseProvider;
+import com.TermPedia.factory.provider.EnvProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 

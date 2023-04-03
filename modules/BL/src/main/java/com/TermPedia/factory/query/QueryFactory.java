@@ -1,7 +1,7 @@
 package com.TermPedia.factory.query;
 
 import com.TermPedia.dto.exceptions.ActionsException;
-import com.TermPedia.factory.BaseProvider;
+import com.TermPedia.factory.provider.BaseProvider;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Hashtable;
@@ -11,7 +11,7 @@ public abstract class QueryFactory {
     public abstract TagsSearcher createTagSearcher() throws ActionsException;
     public abstract AuthorsSearcher createAuthorSearcher() throws ActionsException;
     public abstract LitTypesSearcher createLitTypesSearcher() throws ActionsException;
-    public abstract BookSearcher createBookSearcher() throws ActionsException;
+    public abstract LiteratureSearcher createBookSearcher() throws ActionsException;
 
     private static QueryFactory factory = null;
     public static QueryFactory instance() throws NullPointerException {

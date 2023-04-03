@@ -1,8 +1,7 @@
 package com.TermPedia.factory.query.postgres;
 
-import com.TermPedia.events.EventType;
+import com.TermPedia.commands.events.EventType;
 import com.TermPedia.factory.command.EventData;
-import com.TermPedia.factory.query.postgres.PostgresUsersRequests;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
